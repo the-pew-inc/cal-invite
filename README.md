@@ -2,8 +2,8 @@
 
 A Ruby gem for generating calendar invitations across multiple calendar platforms with caching and webhook support.
 
-[![Gem Version](https://badge.fury.io/rb/calendar_invites.svg)](https://badge.fury.io/rb/calendar_invites)
-[![Ruby](https://github.com/yourusername/calendar_invites/workflows/Ruby/badge.svg)](https://github.com/yourusername/calendar_invites/actions)
+[![Gem Version](https://badge.fury.io/rb/cal-invite.svg)](https://badge.fury.io/rb/cal-invite)
+[![Ruby](https://github.com/the-pew-inc/cal-invite/workflows/Ruby/badge.svg)](https://github.com/yourusername/cal-invite/actions)
 
 ## Compatibility
 
@@ -34,7 +34,7 @@ Any calendar application that supports the iCalendar (.ics) standard should work
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'calendar_invites'
+gem 'cal-invite'
 ```
 
 And then execute:
@@ -44,7 +44,7 @@ $ bundle install
 
 Or install it yourself as:
 ```bash
-$ gem install calendar_invites
+$ gem install cal-invite
 ```
 
 ## Configuration
@@ -52,14 +52,14 @@ $ gem install calendar_invites
 Create an initializer in your Rails application:
 
 ```ruby
-# config/initializers/calendar_invites.rb
+# config/initializers/cal-invite.rb
 CalendarInvites.configure do |config|
   # Cache store configuration (defaults to :memory_store)
   # For production, recommend using Rails.cache
   config.cache_store = Rails.cache
   
   # Prefix for cache keys (optional)
-  config.cache_prefix = 'my_app_calendar_invites'
+  config.cache_prefix = 'my_app_cal-invite'
   
   # Secret for webhook signature verification (required for webhooks)
   config.webhook_secret = Rails.application.credentials.calendar_webhook_secret
