@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative "lib/cal/invite/version"
+require_relative "lib/cal_invite/version"
 
 Gem::Specification.new do |spec|
   spec.name = "cal-invite"

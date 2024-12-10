@@ -1,11 +1,11 @@
-# lib/calendar_invites.rb
-require 'calendar_invites/version'
-require 'calendar_invites/configuration'
-require 'calendar_invites/event'
-require 'calendar_invites/providers'
-require 'calendar_invites/cache'
-require 'calendar_invites/webhooks'
-require 'calendar_invites/errors'
+# lib/cal_invite.rb
+require 'cal_invite/version'
+require 'cal_invite/configuration'
+require 'cal_invite/event'
+require 'cal_invite/providers'
+require 'cal_invite/cache'
+require 'cal_invite/webhooks'
+require 'cal_invite/errors'
 
 module CalendarInvites
   class Error < StandardError; end
