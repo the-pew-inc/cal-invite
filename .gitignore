@@ -6,3 +6,14 @@
 /pkg/
 /spec/reports/
 /tmp/
+
+vendor/
+pkg/
+*.gem
+Gemfile.lock
+gemfiles/*.lock
+.ruby-version
+.ruby-gemset
+.env
+.env.*
+.DS_Store

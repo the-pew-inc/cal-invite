@@ -20,25 +20,25 @@ jobs:
     timeout-minutes: 60
 
     steps:
-      - uses: actions/checkout@v3  # Node.js 20 compatible
+      - uses: actions/checkout@v3
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: ${{ matrix.ruby-version }}
+          bundler-cache: true # This will cache installed gems automatically
       
-      - name: Cache gems
-        uses: actions/cache@v3  # Node.js 20 compatible
-        with:
-          path: vendor/bundle
-          key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-gems-
+      - name: Setup test environment
+        run: |
+          mkdir -p gemfiles
+          cp gemfiles/Gemfile.rails${{ matrix.rails-version }} Gemfile
 
-      - run: |
-          BUNDLE_GEMFILE=gemfiles/Gemfile.rails${{ matrix.rails-version }} bundle install
+      - name: Install dependencies
+        run: |
+          bundle config path vendor/bundle
+          bundle install
 
       - name: Run tests
-        run: BUNDLE_GEMFILE=gemfiles/Gemfile.rails${{ matrix.rails-version }} rake test
+        run: bundle exec rake test
 
   build:
     name: Build + Publish
@@ -50,28 +50,22 @@ jobs:
       packages: write
 
     steps:
-      - uses: actions/checkout@v3  # Node.js 20 compatible
+      - uses: actions/checkout@v3
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: 3.3
+          bundler-cache: true
 
-      - name: Cache gems
-        uses: actions/cache@v3  # Node.js 20 compatible
-        with:
-          path: vendor/bundle
-          key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-gems-
-
-      - run: bundle install
-
-      - name: Publish to RubyGems
+      - name: Prepare for publishing
         run: |
           mkdir -p $HOME/.gem
           touch $HOME/.gem/credentials
           chmod 0600 $HOME/.gem/credentials
           printf -- "---\n:rubygems_api_key: ${GEM_HOST_API_KEY}\n" > $HOME/.gem/credentials
+
+      - name: Build and publish
+        run: |
           gem build *.gemspec
           gem push *.gem
         env:
