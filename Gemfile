@@ -1,12 +1,13 @@
 # frozen_string_literal: true
-
 source "https://rubygems.org"
 
-# Specify your gem's dependencies in cal-invite.gemspec
 gemspec
 
-gem "rake", "~> 13.0"
+group :development, :test do
+  gem "bundler"
+  gem "minitest"
+  gem "rake", "~> 13.0"
+  gem "uri"
+end
 
-gem "minitest", "~> 5.16"
-
-gem "rubocop", "~> 1.21"
+gem "simplecov", require: false, group: :test

@@ -1,10 +1,16 @@
+# frozen_string_literal: true
 source "https://rubygems.org"
 
-gemspec path: "../../"
+group :development, :test do
+  gem "bundler"
+  gem "rails", "~> 7.0.0"
+  gem "actionview", "~> 7.0.0"
+  gem "activesupport", "~> 7.0.0"
+  gem "activemodel", "~> 7.0.0"
+  gem "minitest"
+  gem "rake", "~> 13.0"
+  gem "tzinfo"
+  gem "uri"
+end
 
-gem "rails", "~> 7.0.0"
-gem "rake"
-gem "minitest"
-gem "tzinfo"
-gem "activesupport"
-gem "activemodel"
+gem "simplecov", require: false, group: :test
