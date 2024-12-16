@@ -1,5 +1,5 @@
-# lib/calendar_invites/providers/base_provider.rb
-module CalendarInvites
+# lib/cal_invite/providers/base_provider.rb
+module CalInvite
   module Providers
     class BaseProvider
       attr_reader :event

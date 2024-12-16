@@ -4,21 +4,21 @@ require_relative "lib/cal_invite/version"
 
 Gem::Specification.new do |spec|
   spec.name = "cal-invite"
-  spec.version = Cal::Invite::VERSION
+  spec.version = CalInvite::VERSION
   spec.authors = ["Stephane Paquet"]
   spec.email = ["176050+spaquet@users.noreply.github.com"]
 
-  spec.summary = "TODO: Write a short summary, because RubyGems requires one."
-  spec.description = "TODO: Write a longer description or delete this line."
-  spec.homepage = "TODO: Put your gem's website or public repo URL here."
+  spec.summary = "CalInvite is a gem to generate calendar invitations."
+  spec.description = "CalInvite is a gem to generate calendar invitations and provides an easu way to generate .ics files or link to quickly save an event date/time into the major calendards such as Google Calendar, Microsoft Outlook, Apple Calendar and many more."
+  spec.homepage = "https://github.com/the-pew-inc/cal-invite"
   spec.license = "MIT"
   spec.required_ruby_version = ">= 3.0.0"
 
   spec.metadata["allowed_push_host"] = "TODO: Set to your gem server 'https://example.com'"
 
   spec.metadata["homepage_uri"] = spec.homepage
-  spec.metadata["source_code_uri"] = "TODO: Put your gem's public repo URL here."
-  spec.metadata["changelog_uri"] = "TODO: Put your gem's CHANGELOG.md URL here."
+  spec.metadata["source_code_uri"] = "https://github.com/the-pew-inc/cal-invite"
+  spec.metadata["changelog_uri"] = "https://github.com/the-pew-inc/cal-invite/blob/master/CHANGELOG.md"
 
   # Specify which files should be added to the gem when it is released.
   # The `git ls-files -z` loads the files in the RubyGem that have been added into git.

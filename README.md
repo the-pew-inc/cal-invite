@@ -1,4 +1,4 @@
-# CalendarInvites
+# CalInvite
 
 A Ruby gem for generating calendar invitations across multiple calendar platforms with caching and webhook support.
 

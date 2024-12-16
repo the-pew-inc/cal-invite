@@ -1,5 +1,5 @@
 # lib/calendar_invites/cache.rb
-module CalendarInvites
+module CalInvite
   class Cache
     class << self
       def fetch(key, &block)
@@ -13,7 +13,7 @@ module CalendarInvites
       private
 
       def store
-        @store ||= ActiveSupport::Cache.lookup_store(CalendarInvites.configuration.cache_store)
+        @store ||= ActiveSupport::Cache.lookup_store(CalInvite.configuration.cache_store)
       end
     end
   end
