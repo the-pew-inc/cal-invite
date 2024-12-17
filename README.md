@@ -7,17 +7,16 @@ A Ruby gem for generating calendar invitations across multiple calendar platform
 
 ## Compatibility
 
-- Ruby >= 2.7.0
+- Ruby >= 3.0.0
 - Rails 6.0, 6.1, 7.0, 7.1, 8.0
-- ActiveSupport/ActiveModel compatible frameworks
 
 ## Supported Calendar Platforms
 
 Direct Integration:
-- Google Calendar
-- Microsoft Outlook
-- Yahoo Calendar
 - Apple iCal
+- Microsoft Outlook
+- Google Calendar
+- Yahoo Calendar
 - Standard .ics file generation
 
 Any calendar application that supports the iCalendar (.ics) standard should work, including but not limited to:
@@ -45,28 +44,6 @@ $ bundle install
 Or install it yourself as:
 ```bash
 $ gem install cal-invite
-```
-
-## Configuration
-
-Create an initializer in your Rails application:
-
-```ruby
-# config/initializers/cal-invite.rb
-CalendarInvites.configure do |config|
-  # Cache store configuration (defaults to :memory_store)
-  # For production, recommend using Rails.cache
-  config.cache_store = Rails.cache
-  
-  # Prefix for cache keys (optional)
-  config.cache_prefix = 'my_app_cal-invite'
-  
-  # Secret for webhook signature verification (required for webhooks)
-  config.webhook_secret = Rails.application.credentials.calendar_webhook_secret
-  
-  # Default timezone (defaults to 'UTC')
-  config.timezone = 'UTC'
-end
 ```
 
 ## Usage
@@ -108,7 +85,10 @@ event = CalInvite::Event.new(
   notes: "Bring your own laptop"
 )
 
+ical_url    = event.calendar_url(:ical)
 google_url  = event.calendar_url(:google)
+outlook_url = event.calendar_url(:outlook)
+yahoo_url   = event.calendar_url(:yahoo)
 ics_content = event.calendar_url(:ics)
 ```
 
