@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+## [0.1.1] - 2024-12-17
+
+Fixing a bug in the gemspec file
+
 ## [0.1.0] - 2024-12-17
 
 First public release of the Calendar Invite gem
