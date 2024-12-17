@@ -1,5 +1,15 @@
 ## [Unreleased]
 
-## [0.1.0] - 2024-12-07
+## [0.1.0] - 2024-12-17
 
-- Initial release
+First public release of the Calendar Invite gem
+
+Support the calendar invites for the following calendars:
+
+- Microsoft Outlook
+- Google Calendar
+- Yahoo Calendar
+
+Support Apple iCal
+
+Support other calendars via .ics
