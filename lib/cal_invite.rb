@@ -3,11 +3,8 @@ require 'cal_invite/version'
 require 'cal_invite/configuration'
 require 'cal_invite/event'
 require 'cal_invite/providers'
-require 'cal_invite/cache'
-require 'cal_invite/webhooks'
-require 'cal_invite/errors'
 
-module CalendarInvites
+module CalInvite
   class Error < StandardError; end
 
   class << self

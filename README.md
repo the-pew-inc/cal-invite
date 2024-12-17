@@ -74,18 +74,42 @@ end
 ### Basic Event Creation
 
 ```ruby
+# Single day event
 event = CalInvite::Event.new(
   title: "Team Meeting",
-  start_time: Time.now,
-  duration: 3600, # 1 hour in seconds
+  start_time: Time.current,
+  end_time: Time.current + 2.hours,
   description: "Weekly team sync",
   location: "Conference Room A",
-  attendees: ["person@example.com"]
+  url: "https://zoom.us/j/123456789",
+  attendees: ["person@example.com"],
+  show_attendees: true,
+  timezone: "America/New_York",
+  notes: "Please bring your laptop"
 )
 
-yahoo_url = event.calendar_url(:yahoo)
-ical_url = event.calendar_url(:ical)
-outlook_url = event.calendar_url(:outlook)
+# Multi-day event
+event = CalInvite::Event.new(
+  title: "Training Workshop",
+  multi_day_sessions: [
+    {
+      start_time: Time.parse("2024-03-01 08:00:00 UTC"),
+      end_time: Time.parse("2024-03-01 17:00:00 UTC")
+    },
+    {
+      start_time: Time.parse("2024-03-02 09:00:00 UTC"),
+      end_time: Time.parse("2024-03-02 13:00:00 UTC")
+    }
+  ],
+  description: "Advanced Ruby Training",
+  location: "Training Center",
+  url: "https://zoom.us/j/123456789",
+  timezone: "America/New_York",
+  notes: "Bring your own laptop"
+)
+
+google_url  = event.calendar_url(:google)
+ics_content = event.calendar_url(:ics)
 ```
 
 ## Development
