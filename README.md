@@ -4,7 +4,7 @@ A Ruby gem for generating calendar invitations across multiple calendar platform
 
 [![Gem Version](https://badge.fury.io/rb/cal-invite.svg)](https://badge.fury.io/rb/cal-invite)
 ![Build Status](https://github.com/the-pew-inc/cal-invite/actions/workflows/main.yml/badge.svg)
-
+[![Ruby](https://github.com/the-pew-inc/cal-invite/workflows/Ruby/badge.svg)](https://github.com/the-pew-inc/cal-invite/actions)
 ## Compatibility
 
 - Ruby >= 3.0.0
