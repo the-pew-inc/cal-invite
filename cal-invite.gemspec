@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.authors = ["Stephane Paquet"]
   spec.email = ["176050+spaquet@users.noreply.github.com"]
 
-  spec.summary = "CalInvite is a gem to generate calendar invitations."
-  spec.description = "CalInvite is a gem to generate calendar invitations and provides an easu way to generate .ics files or link to quickly save an event date/time into the major calendards such as Google Calendar, Microsoft Outlook, Apple Calendar and many more."
+  spec.summary = "A Ruby gem for generating calendar invite URLs and ICS files"
+  spec.description = "CalInvite provides a simple way to generate calendar invite URLs for various providers (Google, Outlook, Yahoo) and ICS files"
   spec.homepage = "https://github.com/the-pew-inc/cal-invite"
   spec.license = "MIT"
   spec.required_ruby_version = ">= 3.0.0"
