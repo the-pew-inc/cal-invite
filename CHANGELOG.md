@@ -4,6 +4,11 @@
 
 ## [v0.1.2] - 2024-12-17
 
+- Add support to Microsoft office 365 calendar invite URL
+- Update the README
+- Add an example
+- Better testing
+
 ## [v0.1.1] - 2024-12-17
 
 Fixing a bug in the gemspec file

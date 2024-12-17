@@ -1,10 +1,12 @@
-# CalInvite
+# 📅 CalInvite
 
 A Ruby gem for generating calendar invitations across multiple calendar platforms with caching and webhook support.
 
 [![Gem Version](https://badge.fury.io/rb/cal-invite.svg)](https://badge.fury.io/rb/cal-invite)
 ![Build Status](https://github.com/the-pew-inc/cal-invite/actions/workflows/main.yml/badge.svg)
-[![Ruby](https://github.com/the-pew-inc/cal-invite/workflows/Ruby/badge.svg)](https://github.com/the-pew-inc/cal-invite/actions)
+
+[![License](https://img.shields.io/github/license/the-pew-inc/cal-invite.svg)]
+
 ## Compatibility
 
 - Ruby >= 3.0.0
@@ -15,18 +17,18 @@ A Ruby gem for generating calendar invitations across multiple calendar platform
 Direct Integration:
 - Apple iCal
 - Microsoft Outlook
+- Microsoft Outlook 365
 - Google Calendar
 - Yahoo Calendar
 - Standard .ics file generation
 
 Any calendar application that supports the iCalendar (.ics) standard should work, including but not limited to:
-- ProtonCalendar
+- Proton Calendar
 - FastMail Calendar
 - Thunderbird Calendar
 - Zoho Calendar
 - Microsoft Teams Calendar
 - Zoom Calendar Integration
-- Office 365 Calendar
 
 ## Installation
 
@@ -85,11 +87,12 @@ event = CalInvite::Event.new(
   notes: "Bring your own laptop"
 )
 
-ical_url    = event.calendar_url(:ical)
-google_url  = event.calendar_url(:google)
-outlook_url = event.calendar_url(:outlook)
-yahoo_url   = event.calendar_url(:yahoo)
-ics_content = event.calendar_url(:ics)
+ical_url       = event.calendar_url(:ical)
+google_url     = event.calendar_url(:google)
+outlook_url    = event.calendar_url(:outlook)
+outlook365_url = event.calendar_url(:office365)
+yahoo_url      = event.calendar_url(:yahoo)
+ics_content    = event.calendar_url(:ics)
 ```
 
 ## Development
@@ -98,9 +101,15 @@ After checking out the repo, run `bin/setup` to install dependencies. Then, run 
 
 To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and the created tag, and push the `.gem` file to [rubygems.org](https://rubygems.org).
 
+## Testing
+
+Add test(s) as necessary.
+
+Run all the tests before submiting: `bundle exec rake test`
+
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/cal-invite. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [code of conduct](https://github.com/[USERNAME]/cal-invite/blob/master/CODE_OF_CONDUCT.md).
+Bug reports and pull requests are welcome on GitHub at https://github.com/the-pew-inc/cal-invite. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [code of conduct](https://github.com/the-pew-inc/cal-invite/blob/master/CODE_OF_CONDUCT.md).
 
 ## License
 
@@ -108,4 +117,4 @@ The gem is available as open source under the terms of the [MIT License](https:/
 
 ## Code of Conduct
 
-Everyone interacting in the Cal::Invite project's codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/[USERNAME]/cal-invite/blob/master/CODE_OF_CONDUCT.md).
+Everyone interacting in the Cal::Invite project's codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/the-pew-inc/cal-invite/blob/master/CODE_OF_CONDUCT.md).

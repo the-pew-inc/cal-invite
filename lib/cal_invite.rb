@@ -1,4 +1,8 @@
 # lib/cal_invite.rb
+require 'securerandom'
+require 'time'
+require 'uri'
+
 require 'cal_invite/version'
 require 'cal_invite/configuration'
 require 'cal_invite/event'

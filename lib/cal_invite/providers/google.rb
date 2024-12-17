@@ -4,11 +4,9 @@
 module CalInvite
   module Providers
     class Google < BaseProvider
-      BASE_URL = "https://calendar.google.com/calendar/render"
-
       def generate
-        if event.multi_day_sessions.any?
-          generate_multi_day_event
+        if event.all_day
+          generate_all_day_event
         else
           generate_single_event
         end
@@ -16,50 +14,55 @@ module CalInvite
 
       private
 
+      def generate_all_day_event
+        params = {
+          action: 'TEMPLATE',
+          text: url_encode(event.title),
+          dates: format_all_day_dates
+        }
+
+        add_optional_params(params)
+        build_url(params)
+      end
+
       def generate_single_event
         params = {
-          action: "TEMPLATE",
-          text: event.title,
-          dates: format_dates(event.start_time, event.end_time),
-          details: format_description,
-          location: format_location,
-          ctz: event.timezone
+          action: 'TEMPLATE',
+          text: url_encode(event.title),
+          dates: format_dates
         }
 
-        if attendees_list.any?
-          params[:add] = attendees_list.join(',')
-        end
-
-        "#{BASE_URL}?#{URI.encode_www_form(params)}"
+        add_optional_params(params)
+        build_url(params)
       end
 
-      def generate_multi_day_event
-        # For multi-day events, Google Calendar supports recurring events
-        sessions = event.multi_day_sessions.map do |session|
-          format_dates(session[:start_time], session[:end_time])
-        end
+      def format_all_day_dates
+        # For all-day events, use current date if no start_time specified
+        start_date = event.start_time || Time.now
+        end_date = event.end_time || (start_date + 86400) # Add one day if no end_time
 
-        params = {
-          action: "TEMPLATE",
-          text: event.title,
-          dates: sessions.join(','),
-          details: format_description,
-          location: format_location,
-          ctz: event.timezone
-        }
-
-        if attendees_list.any?
-          params[:add] = attendees_list.join(',')
-        end
-
-        "#{BASE_URL}?#{URI.encode_www_form(params)}"
+        "#{start_date.strftime('%Y%m%d')}/#{end_date.strftime('%Y%m%d')}"
       end
 
-      def format_dates(start_time, end_time)
-        start_time = event.localize_time(start_time)
-        end_time = event.localize_time(end_time)
+      def format_dates
+        raise ArgumentError, "Start time is required" unless event.start_time
+        raise ArgumentError, "End time is required" unless event.end_time
 
-        "#{start_time.strftime('%Y%m%dT%H%M%S')}/#{end_time.strftime('%Y%m%dT%H%M%S')}"
+        start_time = event.start_time
+        end_time = event.end_time
+
+        "#{start_time.utc.strftime('%Y%m%dT%H%M%SZ')}/#{end_time.utc.strftime('%Y%m%dT%H%M%SZ')}"
+      end
+
+      def add_optional_params(params)
+        params[:details] = url_encode(format_description) if format_description
+        params[:location] = url_encode(format_location) if format_location
+        params
+      end
+
+      def build_url(params)
+        query = params.map { |k, v| "#{k}=#{v}" }.join('&')
+        "https://calendar.google.com/calendar/render?#{query}"
       end
     end
   end

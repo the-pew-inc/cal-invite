@@ -8,61 +8,70 @@ module CalInvite
         [
           "BEGIN:VCALENDAR",
           "VERSION:2.0",
-          "PRODID:-//CalInvite//EN",
+          "PRODID:-//CalInvite//Ruby//EN",
           generate_events,
           "END:VCALENDAR"
-        ].flatten.join("\r\n")
+        ].join("\n")
       end
 
       private
 
       def generate_events
         if event.multi_day_sessions.any?
-          event.multi_day_sessions.map { |session| generate_vevent(session[:start_time], session[:end_time]) }
+          event.multi_day_sessions.map { |session| generate_vevent(session) }.join("\n")
         else
-          [generate_vevent(event.start_time, event.end_time)]
+          generate_vevent
         end
       end
 
-      def generate_vevent(start_time, end_time)
-        vevent = [
-          "BEGIN:VEVENT",
-          "UID:#{generate_uid}",
-          "DTSTAMP:#{format_time(Time.now)}",
-          "DTSTART;TZID=#{event.timezone}:#{format_time(start_time)}",
-          "DTEND;TZID=#{event.timezone}:#{format_time(end_time)}",
+      def generate_vevent(session = nil)
+        lines = ["BEGIN:VEVENT"]
+
+        if event.all_day
+          start_date = event.start_time || Time.now
+          end_date = event.end_time || (start_date + 86400)
+
+          lines << "DTSTART;VALUE=DATE:#{format_date(start_date)}"
+          lines << "DTEND;VALUE=DATE:#{format_date(end_date)}"
+        else
+          start_time = session ? session[:start_time] : event.start_time
+          end_time = session ? session[:end_time] : event.end_time
+
+          raise ArgumentError, "Start time is required for non-all-day events" unless start_time
+          raise ArgumentError, "End time is required for non-all-day events" unless end_time
+
+          lines << "DTSTART:#{format_time(start_time)}"
+          lines << "DTEND:#{format_time(end_time)}"
+        end
+
+        lines.concat([
           "SUMMARY:#{event.title}",
-          "DESCRIPTION:#{format_description}",
-        ]
+          "UID:#{generate_uid}"
+        ])
 
-        if format_location
-          vevent << "LOCATION:#{format_location}"
-        end
+        lines << "DESCRIPTION:#{format_description}" if format_description
+        lines << "LOCATION:#{format_location}" if format_location
 
-        if event.url
-          vevent << "URL:#{event.url}"
-        end
-
-        if attendees_list.any?
-          attendees_list.each do |attendee|
-            vevent << "ATTENDEE;RSVP=TRUE:mailto:#{attendee}"
+        if attendees = attendees_list
+          attendees.each do |attendee|
+            lines << "ATTENDEE:mailto:#{attendee}"
           end
         end
 
-        vevent << "END:VEVENT"
-        vevent
+        lines << "END:VEVENT"
+        lines.join("\n")
       end
 
       def generate_uid
-        "#{Time.now.to_i}-#{SecureRandom.hex(8)}@cal-invite"
+        SecureRandom.uuid
+      end
+
+      def format_date(time)
+        time.strftime("%Y%m%d")
       end
 
       def format_time(time)
-        event.localize_time(time).strftime("%Y%m%dT%H%M%S")
-      end
-
-      def escape_text(text)
-        text.to_s.gsub(/[,;\\]/) { |match| "\\#{match}" }
+        time.utc.strftime("%Y%m%dT%H%M%SZ")
       end
     end
   end

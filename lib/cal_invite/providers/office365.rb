@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-# lib/cal_invite/providers/outlook.rb
+# lib/cal_invite/providers/office365.rb
 module CalInvite
   module Providers
-    class Outlook < BaseProvider
+    class Office365 < BaseProvider
       def generate
         if event.all_day
           generate_all_day_event
@@ -16,8 +16,8 @@ module CalInvite
 
       def generate_all_day_event
         params = {
-          path: '/calendar/0/action/compose',
           subject: url_encode(event.title),
+          path: '/calendar/action/compose',
           allday: 'true'
         }
 
@@ -25,8 +25,8 @@ module CalInvite
         start_date = event.start_time || Time.now
         end_date = event.end_time || (start_date + 86400) # Add one day if no end_time
 
-        params[:startdt] = format_date(start_date)
-        params[:enddt] = format_date(end_date)
+        params[:startdt] = url_encode(format_date(start_date))
+        params[:enddt] = url_encode(format_date(end_date))
 
         add_optional_params(params)
         build_url(params)
@@ -34,15 +34,15 @@ module CalInvite
 
       def generate_single_event
         params = {
-          path: '/calendar/0/action/compose',
-          subject: url_encode(event.title)
+          subject: url_encode(event.title),
+          path: '/calendar/action/compose'
         }
 
         raise ArgumentError, "Start time is required" unless event.start_time
         raise ArgumentError, "End time is required" unless event.end_time
 
-        params[:startdt] = format_time(event.start_time)
-        params[:enddt] = format_time(event.end_time)
+        params[:startdt] = url_encode(format_time(event.start_time))
+        params[:enddt] = url_encode(format_time(event.end_time))
 
         add_optional_params(params)
         build_url(params)
@@ -57,8 +57,13 @@ module CalInvite
       end
 
       def add_optional_params(params)
-        params[:body] = url_encode(format_description) if format_description
-        params[:location] = url_encode(format_location) if format_location
+        if description = format_description
+          params[:body] = url_encode(description)
+        end
+
+        if location = format_location
+          params[:location] = url_encode(location)
+        end
 
         if attendees = attendees_list
           params[:to] = url_encode(attendees.join(';'))
@@ -69,7 +74,7 @@ module CalInvite
 
       def build_url(params)
         query = params.map { |k, v| "#{k}=#{v}" }.join('&')
-        "https://outlook.live.com/calendar/0/action/compose?#{query}"
+        "https://outlook.office.com/owa/?#{query}"
       end
     end
   end
