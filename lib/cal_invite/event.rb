@@ -39,6 +39,14 @@ module CalInvite
       @multi_day_sessions = attributes.delete(:multi_day_sessions) || []
       @all_day = attributes.delete(:all_day) || false
 
+      # Convert times to UTC before storing
+      if attributes[:start_time]
+        attributes[:start_time] = ensure_utc(attributes[:start_time])
+      end
+      if attributes[:end_time]
+        attributes[:end_time] = ensure_utc(attributes[:end_time])
+      end
+
       attributes.each do |key, value|
         send("#{key}=", value) if respond_to?("#{key}=")
       end
@@ -82,6 +90,11 @@ module CalInvite
     end
 
     private
+
+    def ensure_utc(time)
+      return nil unless time
+      time.is_a?(Time) ? time.utc : Time.parse(time.to_s).utc
+    end
 
     def timezone_offset
       return '+00:00' if timezone == 'UTC'
