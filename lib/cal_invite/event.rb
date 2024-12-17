@@ -1,51 +1,27 @@
-# lib/calendar_invites/event.rb
-module CalendarInvites
+# frozen_string_literal: true
+
+# lib/cal_invite/event.rb
+module CalInvite
   class Event
-    include ActiveModel::Model
-    include ActiveModel::Validations
-
-    attr_accessor :title, :event_url, :address, :notes, :logo,
-                 :start_date, :end_date, :duration, :timezone,
-                 :organizer, :uid
-
-    validates :title, :start_date, presence: true
-    validates :timezone, presence: true, inclusion: { in: TZInfo::Timezone.all_identifiers }
-    validate :end_date_or_duration_present
+    attr_accessor :title, :start_time, :end_time, :description, :location, :url,
+                  :attendees, :duration
 
     def initialize(attributes = {})
-      super
-      @uid ||= SecureRandom.uuid
-      @timezone ||= CalendarInvites.configuration.timezone
-    end
-
-    def calendar_file(provider)
-      cache_key = "#{CalendarInvites.configuration.cache_prefix}/#{uid}/#{provider}"
-
-      CalendarInvites::Cache.fetch(cache_key) do
-        generator = CalendarInvites::Providers.const_get(provider.to_s.camelize).new(self)
-        generator.generate
+      attributes.each do |key, value|
+        send("#{key}=", value) if respond_to?("#{key}=")
       end
     end
 
-    def invalidate_cache!
-      CalendarInvites::Providers::SUPPORTED_PROVIDERS.each do |provider|
-        cache_key = "#{CalendarInvites.configuration.cache_prefix}/#{uid}/#{provider}"
-        CalendarInvites::Cache.delete(cache_key)
-      end
-    end
-
-    def update_attendees!
-      CalendarInvites::Providers::SUPPORTED_PROVIDERS.each do |provider|
-        provider_instance = CalendarInvites::Providers.const_get(provider.to_s.camelize).new(self)
-        provider_instance.update_attendees
-      end
-      invalidate_cache!
+    def calendar_url(provider)
+      provider_class = CalInvite::Providers.const_get(provider.to_s.camelize)
+      generator = provider_class.new(self)
+      generator.generate
     end
 
     private
 
     def end_date_or_duration_present
-      errors.add(:base, 'Either end_date or duration must be present') unless end_date.present? || duration.present?
+      end_time.present? || duration.present?
     end
   end
 end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # lib/cal_invite/providers/base_provider.rb
 module CalInvite
   module Providers
@@ -9,11 +11,13 @@ module CalInvite
       end
 
       def generate
-        raise NotImplementedError
+        raise NotImplementedError, "#{self.class} must implement #generate"
       end
 
-      def update_attendees
-        raise NotImplementedError
+      protected
+
+      def url_encode(str)
+        URI.encode_www_form_component(str.to_s)
       end
     end
   end

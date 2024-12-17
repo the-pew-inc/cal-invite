@@ -1,13 +1,15 @@
-# lib/calendar_invites/providers.rb
-module CalendarInvites
-  module Providers
-    SUPPORTED_PROVIDERS = [:google, :ical, :outlook, :yahoo, :ics]
+# frozen_string_literal: true
 
-    autoload :BaseProvider, 'calendar_invites/providers/base_provider'
-    autoload :Google, 'calendar_invites/providers/google'
-    autoload :Ical, 'calendar_invites/providers/ical'
-    autoload :Outlook, 'calendar_invites/providers/outlook'
-    autoload :Yahoo, 'calendar_invites/providers/yahoo'
-    autoload :Ics, 'calendar_invites/providers/ics'
+# lib/cal_invite/providers.rb
+module CalInvite
+  module Providers
+    SUPPORTED_PROVIDERS = %i[google ical outlook yahoo ics].freeze
+
+    autoload :BaseProvider, 'cal_invite/providers/base_provider'
+    autoload :Google, 'cal_invite/providers/google'
+    autoload :Ical, 'cal_invite/providers/ical'
+    autoload :Outlook, 'cal_invite/providers/outlook'
+    autoload :Yahoo, 'cal_invite/providers/yahoo'
+    autoload :Ics, 'cal_invite/providers/ics'
   end
 end
