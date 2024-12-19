@@ -8,10 +8,17 @@ on:
   pull_request:
     branches: ["main"]
 
+# Allow one concurrent deployment
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
 jobs:
   test:
     name: Test
     runs-on: ubuntu-latest
+    permissions: 
+      contents: read
     strategy:
       matrix:
         ruby-version: ["3.3"]
@@ -65,13 +72,18 @@ jobs:
     name: Generate and Deploy Documentation
     needs: build
     runs-on: ubuntu-latest
+    # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
     permissions:
-      contents: write
-      pages: write
-      id-token: write
+      contents: read
+      pages: write      # Required for deployment to Pages
+      id-token: write   # Required for verification
+      actions: read     # Required for reading workflow artifacts
+    
+    # Environment for GitHub Pages deployment
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
+    
     steps:
       - uses: actions/checkout@v3
       - name: Set up Ruby

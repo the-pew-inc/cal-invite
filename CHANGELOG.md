@@ -4,6 +4,10 @@
 
 ## [v0.1.3] - 2024-12-19
 
+- Add support to RDoc
+
+## [v0.1.3] - 2024-12-19
+
 - Apple iCal and ics file can now be either generated or wrap to be downloaded
 - Add Caching management support
 - Add CACHING.md for more details about how to use caching in a Rails app
@@ -12,12 +16,16 @@
 
 ## [v0.1.2] - 2024-12-17
 
+⚠️ This version should not be used
+
 - Add support to Microsoft office 365 calendar invite URL
 - Update the README
 - Add an example
 - Better testing
 
 ## [v0.1.1] - 2024-12-17
+
+⚠️ This version should not be used
 
 Fixing a bug in the gemspec file
 
