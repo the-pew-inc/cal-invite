@@ -1,17 +1,36 @@
+# frozen_string_literal: true
+
 # app/lib/base_provider.rb
+# Base class for calendar providers that implements common functionality
+# and defines the interface that all providers must implement.
+#
+# @abstract Subclass and override {#generate} to implement a calendar provider
 class BaseProvider
   attr_reader :event
 
+  # Initialize a new calendar provider
+  #
+  # @param event [CalInvite::Event] The event to generate a calendar URL for
   def initialize(event)
     @event = event
   end
 
+  # Generate a calendar URL or content for the event.
+  # This method must be implemented by all provider subclasses.
+  #
+  # @abstract
+  # @return [String] The generated calendar URL or content
+  # @raise [NotImplementedError] if the provider class doesn't implement this method
   def generate
     raise NotImplementedError, "#{self.class} must implement #generate"
   end
 
   protected
 
+  # URL encode a string for use in calendar URLs
+  #
+  # @param str [#to_s] The string to encode
+  # @return [String] The URL encoded string
   def url_encode(str)
     URI.encode_www_form_component(str.to_s)
   end

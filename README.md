@@ -242,6 +242,12 @@ Run all the tests before submitting: `bundle exec rake test`
 
 Bug reports and pull requests are welcome on GitHub at https://github.com/the-pew-inc/cal-invite. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [code of conduct](https://github.com/the-pew-inc/cal-invite/blob/master/CODE_OF_CONDUCT.md).
 
+## Documentation
+
+The documentation is spread accross the README, CAHCING and the doc folder.
+
+The documentation can be generated using `bundle exec rake rdoc`
+
 ## License
 
 The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).

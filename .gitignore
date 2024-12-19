@@ -3,6 +3,7 @@
 /_yardoc/
 /coverage/
 /doc/
+/doc/.*
 /pkg/
 /spec/reports/
 /tmp/
@@ -16,4 +17,4 @@ gemfiles/*.lock
 .ruby-gemset
 .env
 .env.*
-.DS_Store
+.DS_Storedoc/

@@ -2,6 +2,8 @@
 
 require_relative "lib/cal_invite/version"
 
+# cal-invite.gemspec
+# Gem specification for CalInvite, a Ruby gem that generates calendar invite URLs and ICS files
 Gem::Specification.new do |spec|
   spec.name = "cal-invite"
   spec.version = CalInvite::VERSION
@@ -26,7 +28,7 @@ Gem::Specification.new do |spec|
   spec.files = IO.popen(%w[git ls-files -z], chdir: __dir__, err: IO::NULL) do |ls|
     ls.readlines("\x0", chomp: true).reject do |f|
       (f == gemspec) ||
-        f.start_with?(*%w[bin/ test/ spec/ features/ .git .github appveyor Gemfile example/ Example/])  # Added example/
+        f.start_with?(*%w[bin/ test/ spec/ features/ .git .github appveyor Gemfile example/ Example/ doc/])  # Added example/
     end
   end
   spec.bindir = "exe"
@@ -36,6 +38,19 @@ Gem::Specification.new do |spec|
   # Uncomment to register a new dependency of your gem
   # spec.add_dependency "example-gem", "~> 1.0"
   spec.add_dependency "activesupport", ">= 6.0"
+  spec.add_development_dependency 'rdoc', '~> 6.5'
+
+  # Configure RDoc options
+  spec.rdoc_options = [
+    '--title', 'CalInvite Documentation',
+    '--main', 'README.md',
+    '--line-numbers',
+    '--all',
+    '--charset', 'UTF-8',
+    '--markup', 'markdown',
+    '--exclude', '^(test|spec|features)/',
+    '--exclude', 'lib/cal_invite/version.rb'
+  ]
 
   # For more information and examples about making a new gem, check out our
   # guide at: https://bundler.io/guides/creating_gem.html
