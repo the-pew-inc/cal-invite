@@ -18,5 +18,5 @@ gemfiles/*.lock
 .env
 .env.*
 .DS_Storedoc/
-
-**/*.DS_Store
+.DS_Store
+**/.DS_Store
