@@ -5,7 +5,10 @@
 ## [v0.1.3] - 2024-12-19
 
 - Apple iCal and ics file can now be either generated or wrap to be downloaded
+- Add Caching management support
+- Add CACHING.md for more details about how to use caching in a Rails app
 - Updating the README file to reflect latest usage changes
+- Minor bug fixes and improvments.
 
 ## [v0.1.2] - 2024-12-17
 
