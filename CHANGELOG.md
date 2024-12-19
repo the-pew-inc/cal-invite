@@ -2,6 +2,11 @@
 
 ## [Released]
 
+## [v0.1.3] - 2024-12-19
+
+- Apple iCal and ics file can now be either generated or wrap to be downloaded
+- Updating the README file to reflect latest usage changes
+
 ## [v0.1.2] - 2024-12-17
 
 - Add support to Microsoft office 365 calendar invite URL
