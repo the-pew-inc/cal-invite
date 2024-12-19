@@ -92,8 +92,31 @@ google_url     = event.calendar_url(:google)
 outlook_url    = event.calendar_url(:outlook)
 outlook365_url = event.calendar_url(:office365)
 yahoo_url      = event.calendar_url(:yahoo)
-ics_content    = event.calendar_url(:ics)
 ```
+
+### ICS
+Just get the ICS content:
+```ruby
+event = CalInvite::Event.new(
+  title: "Meeting",
+  start_time: Time.now.utc,
+  end_time: Time.now.utc + 1.hour
+)
+
+# Get raw content
+content = CalInvite::Providers::IcsContent.new(event).generate
+```
+Get content with download headers:
+
+```ruby
+# Get content wrapped for download
+content = CalInvite::Providers::IcsContent.new(event).generate
+download = CalInvite::Providers::IcsDownload.wrap_for_download(content, event.title)
+
+# In a Rails controller:
+send_data(download[:content], download[:headers])
+```
+
 
 ## Development
 

@@ -5,25 +5,11 @@ module CalInvite
   module Providers
     class Ics < BaseProvider
       def generate
-        calendar_lines = [
-          "BEGIN:VCALENDAR",
-          "VERSION:2.0",
-          "PRODID:-//CalInvite//EN",
-          "CALSCALE:GREGORIAN",
-          "METHOD:PUBLISH"
-        ]
+        generate_calendar_content
+      end
 
-        # Add events (either single or multiple sessions)
-        if event.multi_day_sessions.any?
-          event.multi_day_sessions.each do |session|
-            calendar_lines.concat(generate_vevent(session[:start_time], session[:end_time]))
-          end
-        else
-          calendar_lines.concat(generate_vevent(event.start_time, event.end_time))
-        end
-
-        calendar_lines << "END:VCALENDAR"
-        calendar_lines.join("\r\n")
+      def generate_url
+        nil  # ICS provider doesn't generate URLs
       end
 
       private
@@ -83,7 +69,7 @@ module CalInvite
             .gsub("\n", '\\n')
             .gsub(',', '\\,')
             .gsub(';', '\\;')
-        end
+      end
     end
   end
 end

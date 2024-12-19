@@ -25,7 +25,15 @@ module CalInvite
         raise NotImplementedError, "#{self.class} must implement #generate"
       end
 
+      def generate_url
+        raise NotImplementedError, "#{self.class} must implement #generate_url"
+      end
+
       protected
+
+      def url_encode(str)
+        URI.encode_www_form_component(str.to_s)
+      end
 
       # URL encode a string for use in calendar URLs
       #
