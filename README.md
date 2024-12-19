@@ -4,7 +4,6 @@ A Ruby gem for generating calendar invitations across multiple calendar platform
 
 [![Gem Version](https://badge.fury.io/rb/cal-invite.svg)](https://badge.fury.io/rb/cal-invite)
 ![Build Status](https://github.com/the-pew-inc/cal-invite/actions/workflows/main.yml/badge.svg)
-
 [![License](https://img.shields.io/github/license/the-pew-inc/cal-invite.svg)]
 
 ## Compatibility
@@ -15,7 +14,7 @@ A Ruby gem for generating calendar invitations across multiple calendar platform
 ## Supported Calendar Platforms
 
 Direct Integration:
-- Apple iCal
+- Apple iCal (with proper timezone support)
 - Microsoft Outlook
 - Microsoft Outlook 365
 - Google Calendar
@@ -52,19 +51,45 @@ $ gem install cal-invite
 
 ### Basic Event Creation
 
+Important notes:
+- Always provide times in UTC
+- Use the timezone parameter to specify the display timezone
+- Location and URL are handled separately for better calendar integration
+
 ```ruby
-# Single day event
+# Create an event with physical location
 event = CalInvite::Event.new(
   title: "Team Meeting",
-  start_time: Time.current,
-  end_time: Time.current + 2.hours,
+  start_time: Time.current.utc,  # Always use UTC times
+  end_time: Time.current.utc + 2.hours,
   description: "Weekly team sync",
-  location: "Conference Room A",
-  url: "https://zoom.us/j/123456789",
+  location: "Conference Room A",  # Physical location
+  timezone: "America/New_York",  # Display timezone
   attendees: ["person@example.com"],
   show_attendees: true,
-  timezone: "America/New_York",
   notes: "Please bring your laptop"
+)
+
+# Create an event with both physical and virtual locations
+event = CalInvite::Event.new(
+  title: "Hybrid Meeting",
+  start_time: Time.current.utc,
+  end_time: Time.current.utc + 2.hours,
+  description: "Weekly team sync",
+  location: "Conference Room A",  # Physical location
+  url: "https://zoom.us/j/123456789",  # Virtual meeting URL
+  timezone: "America/New_York",
+  attendees: ["person@example.com"],
+  show_attendees: true
+)
+
+# All-day event
+event = CalInvite::Event.new(
+  title: "Company All-Day Event",
+  start_time: Date.today.beginning_of_day.utc,
+  end_time: Date.today.end_of_day.utc,
+  all_day: true,
+  timezone: "America/New_York"
 )
 
 # Multi-day event
@@ -82,41 +107,104 @@ event = CalInvite::Event.new(
   ],
   description: "Advanced Ruby Training",
   location: "Training Center",
-  url: "https://zoom.us/j/123456789",
+  url: "https://zoom.us/j/123456789",  # Virtual meeting URL kept separate
   timezone: "America/New_York",
   notes: "Bring your own laptop"
 )
 
-ical_url       = event.calendar_url(:ical)
-google_url     = event.calendar_url(:google)
-outlook_url    = event.calendar_url(:outlook)
-outlook365_url = event.calendar_url(:office365)
-yahoo_url      = event.calendar_url(:yahoo)
+# Generate calendar URLs
+ical_url       = event.generate_calendar_url(:ical)
+google_url     = event.generate_calendar_url(:google)
+outlook_url    = event.generate_calendar_url(:outlook)
+outlook365_url = event.generate_calendar_url(:office365)
+yahoo_url      = event.generate_calendar_url(:yahoo)
 ```
 
-### ICS
-Just get the ICS content:
+### Implementing ICS Downloads
+
+To enable ICS file downloads in your application, you'll need to:
+
+1. Create an endpoint that will handle the download request
+2. Generate the ICS content
+3. Send the file to the user
+
+Here's a basic example of the controller logic:
+
+```ruby
+# In your controller action
+def download_calendar
+  event = # ... your event creation logic ...
+  
+  content = CalInvite::Providers::Ics.new(event).generate
+  filename = "#{event.title.downcase.gsub(/[^0-9A-Za-z.\-]/, '_')}_#{Time.now.strftime('%Y%m%d')}.ics"
+  
+  send_data(
+    content,
+    filename: filename,
+    type: 'text/calendar; charset=UTF-8',
+    disposition: 'attachment'
+  )
+end
+```
+
+You can implement this in any controller and route that makes sense for your application's architecture.
+
+### ICS File Generation
+
+The gem provides two ways to generate ICS files:
+
+1. Direct content generation:
 ```ruby
 event = CalInvite::Event.new(
   title: "Meeting",
-  start_time: Time.now.utc,
-  end_time: Time.now.utc + 1.hour
+  start_time: Time.current.utc,
+  end_time: Time.current.utc + 1.hour,
+  timezone: "America/New_York"
 )
 
-# Get raw content
-content = CalInvite::Providers::IcsContent.new(event).generate
+# Generate ICS content
+content = CalInvite::Providers::Ics.new(event).generate
 ```
-Get content with download headers:
 
+2. Rails controller integration:
 ```ruby
-# Get content wrapped for download
-content = CalInvite::Providers::IcsContent.new(event).generate
-download = CalInvite::Providers::IcsDownload.wrap_for_download(content, event.title)
-
-# In a Rails controller:
-send_data(download[:content], download[:headers])
+# In your controller
+def download_ics
+  event = CalInvite::Event.new(
+    title: "Meeting",
+    start_time: Time.current.utc,
+    end_time: Time.current.utc + 1.hour,
+    timezone: "America/New_York"
+  )
+  
+  content = CalInvite::Providers::Ics.new(event).generate
+  filename = "#{event.title.downcase.gsub(/[^0-9A-Za-z.\-]/, '_')}_#{Time.now.strftime('%Y%m%d')}.ics"
+  
+  send_data(
+    content,
+    filename: filename,
+    type: 'text/calendar; charset=UTF-8',
+    disposition: 'attachment'
+  )
+end
 ```
 
+### Important Notes
+
+1. Time Handling:
+   - Always provide times in UTC to the Event constructor
+   - Use the timezone parameter to specify the display timezone
+   - All-day events should use beginning_of_day.utc and end_of_day.utc
+
+2. Location and URL:
+   - Physical location goes in the `location` parameter
+   - Virtual meeting URL goes in the `url` parameter
+   - They are handled separately for better calendar integration
+
+3. ICS Files:
+   - Both Apple iCal and standard ICS files now properly handle timezones
+   - Attendees are properly formatted with RSVP options
+   - Virtual meeting URLs are properly separated from physical locations
 
 ## Development
 
@@ -128,7 +216,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 Add test(s) as necessary.
 
-Run all the tests before submiting: `bundle exec rake test`
+Run all the tests before submitting: `bundle exec rake test`
 
 ## Contributing
 
