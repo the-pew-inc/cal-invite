@@ -1,10 +1,13 @@
 # lib/cal_invite.rb
+require 'active_support'
+require 'active_support/core_ext'
 require 'securerandom'
 require 'time'
 require 'uri'
 
 require 'cal_invite/version'
 require 'cal_invite/configuration'
+require 'cal_invite/caching'
 require 'cal_invite/event'
 require 'cal_invite/providers'
 
@@ -22,5 +25,8 @@ module CalInvite
     def reset_configuration!
       self.configuration = Configuration.new
     end
+
+    # Include caching methods at the module level
+    include Caching
   end
 end
