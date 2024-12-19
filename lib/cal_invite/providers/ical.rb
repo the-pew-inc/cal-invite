@@ -89,7 +89,8 @@ module CalInvite
       end
 
       def format_local_time(time)
-        time.in_time_zone(event.timezone).strftime("%Y%m%dT%H%M%S")
+        # All times are already in UTC, just format them
+        time.strftime("%Y%m%dT%H%M%S")
       end
 
       def format_timestamp(time)
