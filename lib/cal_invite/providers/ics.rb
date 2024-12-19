@@ -60,16 +60,19 @@ module CalInvite
       end
 
       def add_optional_fields(vevent)
-        if desc = format_description
-          vevent << "DESCRIPTION:#{escape_text(desc)}"
+        description_parts = []
+        description_parts << format_description if format_description
+
+        if description_parts.any?
+          vevent << "DESCRIPTION:#{escape_text(description_parts.join('\n\n'))}"
         end
 
-        if event.location
-          vevent << "LOCATION:#{escape_text(event.location)}"
+        if location = format_location
+          vevent << "LOCATION:#{escape_text(location)}"
         end
 
-        if event.url
-          vevent << "URL:#{escape_text(event.url)}"
+        if url = format_url
+          vevent << "URL:#{escape_text(url)}"
         end
 
         if attendees_list.any?

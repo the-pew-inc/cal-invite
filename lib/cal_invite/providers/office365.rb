@@ -58,13 +58,12 @@ module CalInvite
       end
 
       def add_optional_params(params)
-        if description = format_description
-          params[:body] = url_encode(description)
-        end
+        description_parts = []
+        description_parts << format_description if format_description
+        description_parts << "Virtual Meeting URL: #{format_url}" if format_url
+        params[:body] = url_encode(description_parts.join("\n\n")) if description_parts.any?
 
-        if location = format_location
-          params[:location] = url_encode(location)
-        end
+        params[:location] = url_encode(format_location) if format_location
 
         if attendees = attendees_list
           params[:to] = url_encode(attendees.join(';'))

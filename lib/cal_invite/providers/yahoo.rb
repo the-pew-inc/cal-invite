@@ -42,6 +42,10 @@ module CalInvite
         raise ArgumentError, "Start time is required" unless event.start_time
         raise ArgumentError, "End time is required" unless event.end_time
 
+        description_parts = []
+        description_parts << format_description if format_description
+        description_parts << "Virtual Meeting URL: #{format_url}" if format_url
+
         params = {
           v: 60,
           view: 'd',
@@ -49,7 +53,7 @@ module CalInvite
           title: event.title,
           st: format_time(event.start_time),
           et: format_time(event.end_time),
-          desc: format_description,
+          desc: description_parts.join("\n\n"),
           in_loc: format_location,
           crnd: event.timezone
         }
