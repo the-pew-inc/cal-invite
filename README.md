@@ -206,8 +206,25 @@ end
    - Attendees are properly formatted with RSVP options
    - Virtual meeting URLs are properly separated from physical locations
 
-## CACHING - PERFORMANCE
-For detailed information about configuring caching in Rails applications, see our [Caching Guide](https://github.com/the-pew-inc/cal-invite/blob/master/CACHING.md)
+## Caching Support
+
+CalInvite includes built-in caching support to improve performance when generating calendar URLs. To enable caching in your Rails application:
+
+```ruby
+# config/initializers/cal_invite.rb
+CalInvite.configure do |config|
+  # Use Rails cache by default
+  config.cache_store = Rails.cache
+  
+  # Optional: Set cache prefix
+  config.cache_prefix = 'my_app_cal_invite'
+  
+  # Optional: Set expiration time (in seconds)
+  config.cache_expires_in = 3600 # 1 hour
+end
+```
+
+For detailed information about configuring caching in Rails applications and available options, see our [Caching Guide](https://github.com/the-pew-inc/cal-invite/blob/master/CACHING.md)
 
 ## Development
 

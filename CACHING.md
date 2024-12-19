@@ -1,6 +1,6 @@
 ## Caching
 
-CalInvite supports flexible caching options when used within a Rails application. You can configure the cache store to use any of Rails' supported cache stores including memory store, Redis, Memcached, or Active Record.
+CalInvite supports flexible caching options when used within a Rails application. You can configure the cache store to use any of Rails' supported cache stores including memory store, Redis, or a custom cache store implementation.
 
 ### Basic Configuration
 
@@ -14,83 +14,44 @@ CalInvite.configure do |config|
   
   # Optional: Set a custom prefix for cache keys
   config.cache_prefix = 'my_app_cal_invite'
+  
+  # Optional: Set cache expiration (in seconds)
+  config.cache_expires_in = 3600 # 1 hour
 end
 ```
 
 ### Available Cache Stores
 
-CalInvite supports all cache stores available in Rails:
+CalInvite supports the following cache stores:
 
 1. Memory Store (default)
 ```ruby
 config.cache_store = :memory_store
 ```
 
-2. Redis Cache Store
+2. Null Store (for disabling caching)
 ```ruby
-config.cache_store = :redis_cache_store, {
-  url: ENV['REDIS_URL'],
-  namespace: 'cal_invite'
-}
+config.cache_store = :null_store
 ```
 
-3. Memcached
+3. Custom Cache Store
 ```ruby
-config.cache_store = :mem_cache_store, 'localhost:11211'
+# Any object that implements read/write/delete methods
+config.cache_store = MyCacheStore.new
 ```
 
-4. Active Record (using your database)
+4. Rails Cache
 ```ruby
-config.cache_store = :active_record_store
+# Use your Rails application's configured cache
+config.cache_store = Rails.cache
 ```
 
-### Cache Management
+### Cache Configuration Options
 
-CalInvite provides several methods to manage the cache:
-
-```ruby
-# Clear all CalInvite caches
-CalInvite.clear_cache!
-
-# Clear cache for a specific event
-CalInvite.clear_event_cache!(event_id)
-
-# Clear cache for a specific provider
-CalInvite.clear_provider_cache!(provider_name)
-
-# Get cached value
-CalInvite.fetch_from_cache(key) { yield }
-
-# Write to cache with optional expiration
-CalInvite.write_to_cache(key, value, expires_in: 1.hour)
-```
-
-### Cache Key Generation
-
-CalInvite uses a standardized format for cache keys:
-
-```ruby
-# Format: "#{prefix}:#{scope}:#{identifier}"
-cache_key = CalInvite.generate_cache_key('events', event_id)
-```
-
-### Automatic Cache Invalidation
-
-The cache is automatically invalidated in the following scenarios:
-
-1. When an event is updated
-2. When provider configurations change
-3. When the gem version is updated
-
-You can also set up automatic cache expiration:
-
-```ruby
-CalInvite.configure do |config|
-  config.cache_store = Rails.cache
-  config.cache_prefix = 'cal_invite'
-  config.cache_expires_in = 24.hours # Default cache expiration
-end
-```
+- `cache_store`: The storage mechanism for cached data
+- `cache_prefix`: Prefix for all cache keys (default: 'cal_invite')
+- `cache_expires_in`: Default cache expiration time in seconds
+- `timezone`: Default timezone for cache keys (default: 'UTC')
 
 ### Custom Cache Adapters
 
@@ -99,19 +60,20 @@ You can implement custom cache adapters by creating a class that responds to the
 ```ruby
 class CustomCacheStore
   def read(key)
-    # Implementation
+    # Implementation for retrieving cached value
   end
 
   def write(key, value, options = {})
-    # Implementation
+    # Implementation for storing value in cache
+    # options may include :expires_in
   end
 
   def delete(key)
-    # Implementation
+    # Implementation for removing cached value
   end
 
   def clear
-    # Implementation
+    # Implementation for clearing all cached values
   end
 end
 
@@ -121,38 +83,32 @@ CalInvite.configure do |config|
 end
 ```
 
+### Automatic Cache Invalidation
+
+The cache is automatically invalidated in the following scenarios:
+
+1. When event attributes are updated via `update_attributes`
+2. When a new calendar URL is generated
+3. When the configuration changes
+
 ### Best Practices
 
-1. **Cache Keys**: Use meaningful and unique cache keys to avoid collisions:
-```ruby
-cache_key = "#{CalInvite.configuration.cache_prefix}:events:#{event.id}:#{provider}"
-```
+1. **Cache Store Selection**: Choose an appropriate cache store based on your needs:
+   - Use `:memory_store` for development and small applications
+   - Use Rails.cache for production applications
+   - Implement a custom cache store for specific requirements
 
-2. **Cache Expiration**: Set appropriate expiration times based on your needs:
-```ruby
-CalInvite.write_to_cache(key, value, expires_in: 12.hours)
-```
+2. **Cache Key Management**:
+   - The gem automatically generates unique cache keys based on event attributes
+   - Keys include a prefix for namespace isolation
+   - Consider your timezone settings when debugging cache issues
 
-3. **Cache Warming**: Implement cache warming for frequently accessed events:
-```ruby
-# In a background job
-frequently_accessed_events.each do |event|
-  CalInvite::Providers::SUPPORTED_PROVIDERS.each do |provider|
-    event.generate_calendar_url(provider)
-  end
-end
-```
+3. **Expiration Strategy**:
+   - Set appropriate expiration times based on your use case
+   - Consider using shorter expiration times for frequently changing data
+   - Use `nil` expiration for permanent caching (until manual invalidation)
 
-4. **Monitoring**: Monitor cache hit rates and adjust caching strategy accordingly:
-```ruby
-# Add instrumentation
-ActiveSupport::Notifications.subscribe("cache_read.cal_invite") do |*args|
-  event = ActiveSupport::Notifications::Event.new(*args)
-  # Log or track cache metrics
-end
-```
-
-### Rails Integration Example
+### Example Rails Integration
 
 Here's a complete example of setting up caching in a Rails application:
 
@@ -160,23 +116,33 @@ Here's a complete example of setting up caching in a Rails application:
 # config/initializers/cal_invite.rb
 CalInvite.configure do |config|
   if Rails.env.production?
-    # Use Redis in production
-    config.cache_store = :redis_cache_store, {
-      url: ENV['REDIS_URL'],
-      namespace: 'cal_invite',
-      expires_in: 12.hours
-    }
+    # Use Rails cache in production
+    config.cache_store = Rails.cache
+    config.cache_expires_in = 1.hour
   else
     # Use memory store in development
     config.cache_store = :memory_store
+    config.cache_expires_in = 5.minutes
   end
 
   config.cache_prefix = "cal_invite:#{Rails.env}"
+  config.timezone = 'UTC'
+end
+```
+
+### Testing with Caching
+
+When writing tests that involve caching:
+
+```ruby
+# In your test setup
+CalInvite.configure do |config|
+  config.cache_store = :memory_store
+  config.cache_expires_in = 3600 # 1 hour in seconds
 end
 
-# Add cache sweepers if needed
-ActiveSupport::Notifications.subscribe("cal_invite.cache.invalidate") do |*args|
-  event = ActiveSupport::Notifications::Event.new(*args)
-  # Perform additional cache invalidation logic
+# Clear cache between tests
+def setup
+  CalInvite.configuration.cache_store.clear
 end
 ```
