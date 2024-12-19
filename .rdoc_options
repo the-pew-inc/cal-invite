@@ -1,0 +1,85 @@
+---
+encoding: UTF-8
+static_path: ["./doc/images"]
+charset: UTF-8
+exclude: ["vendor/*", "tmp/*", ".*/*"]
+hyperlink_all: true
+line_numbers: true
+locale: en
+main: README.md
+markup: markdown
+output_decoration: true
+show_hash: false
+tab_width: 2
+template_stylesheets: []
+title: "CalInvite - Calendar Invite Generator by DashAPI"
+visibility: :public
+webcvs: https://github.com/the-pew-inc/cal-invite
+
+# Custom sections for better organization
+sections:
+  - title: Calendar Providers
+    dir: lib/cal_invite/providers
+    include: ["**/*.rb"]
+  - title: Core
+    dir: lib/cal_invite
+    include: ["*.rb"]
+
+extra_docs:
+  - README.md
+  - CHANGELOG.md
+  - LICENSE.txt
+
+# Options for better documentation organization
+options:
+  all:
+    - "--title=CalInvite - Calendar Invite Generator by DashAPI"
+    - "--line-numbers"
+    - "--diagram"  # Include diagrams if you have any
+    - "--main=README.md"
+  SystemExtension:
+    - "--title=CalInvite System Extensions"
+  
+# Documentation sections
+doc_sections:
+  - "Calendar Provider Implementation"
+  - "Configuration"
+  - "Event Management"
+  - "Utility Functions"
+
+# Additional documentation metadata
+metadata:
+  copyright: "© 2024 ThePew Inc. All rights reserved."
+  authors:
+    - "Stephane Paquet"
+  website: "https://github.com/the-pew-inc/cal-invite"
+  license: "MIT"
+
+# Documentation themes and styles
+template:
+  css: []  # You can add custom CSS files if needed
+  javascript: []  # You can add custom JS files if needed
+
+# Search engine optimization
+search_index:
+  include:
+    - "**/*.rb"
+  exclude:
+    - "test/**/*"
+    - "spec/**/*"
+    - "vendor/**/*"
+
+# Documentation organization
+groups:
+  Core:
+    - CalInvite
+    - CalInvite::Configuration
+    - CalInvite::Event
+  Providers:
+    - CalInvite::Providers::BaseProvider
+    - CalInvite::Providers::Google
+    - CalInvite::Providers::Outlook
+    - CalInvite::Providers::Office365
+    - CalInvite::Providers::Yahoo
+    - CalInvite::Providers::Ics
+    - CalInvite::Providers::Ical
