@@ -2,7 +2,12 @@
 
 ## [Released]
 
-## [v0.1.3] - 2024-12-19
+## [v0.1.5] - 2024-12-19
+
+- Should deploy the doc to a GitHub page
+- Fixing a version number in the CHANGELOG file
+
+## [v0.1.4] - 2024-12-19
 
 - Add support to RDoc
 
