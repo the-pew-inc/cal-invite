@@ -53,7 +53,8 @@ module CalInvite
       end
 
       def format_time(time)
-        time.utc.strftime('%Y-%m-%dT%H:%M:%S')
+        # Always use UTC format, timezone is handled by the calendar
+        time.utc.strftime('%Y-%m-%dT%H:%M:%SZ')
       end
 
       def add_optional_params(params)

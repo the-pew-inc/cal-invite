@@ -11,6 +11,8 @@ module CalInvite
     autoload :Outlook, 'cal_invite/providers/outlook'
     autoload :Office365, 'cal_invite/providers/office365'
     autoload :Yahoo, 'cal_invite/providers/yahoo'
+    autoload :IcsContent, 'cal_invite/providers/ics_content'
+    autoload :IcsDownload, 'cal_invite/providers/ics_content'
     autoload :Ics, 'cal_invite/providers/ics'
 
   end

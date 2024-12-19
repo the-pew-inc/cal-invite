@@ -58,8 +58,6 @@ module CalInvite
       end
 
       def generate_multi_day_event
-        # Yahoo doesn't support multi-day events in a single URL
-        # Return multiple URLs, one for each session
         sessions = event.multi_day_sessions.map do |session|
           params = {
             v: 60,
@@ -84,7 +82,8 @@ module CalInvite
       end
 
       def format_time(time)
-        time.utc.strftime("%Y%m%dT%H%M%S")
+        # Always use UTC format for the URL, timezone is passed separately
+        time.utc.strftime("%Y%m%dT%H%M%SZ")
       end
     end
   end
