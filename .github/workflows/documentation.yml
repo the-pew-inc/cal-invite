@@ -1,0 +1,99 @@
+name: Documentation
+
+on:
+  workflow_call:  # This allows the workflow to be called by other workflows
+    inputs:
+      ruby-version:
+        description: 'Ruby version to use'
+        required: false
+        default: '3.3'
+        type: string
+  workflow_dispatch:  # This allows manual triggering
+    inputs:
+      ruby-version:
+        description: 'Ruby version to use'
+        required: false
+        default: '3.3'
+        type: string
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow one concurrent deployment
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    
+    steps:
+      - name: Delete existing artifacts
+        uses: geekyeggo/delete-artifact@v2
+        with:
+          name: github-pages
+          failOnError: false
+
+      - uses: actions/checkout@v3
+      
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ inputs.ruby-version }}
+          bundler-cache: true
+      
+      - name: Install RDoc
+        run: gem install rdoc
+      
+      - name: Generate Documentation
+        run: |
+          # Clean and create docs directory
+          rm -rf docs
+          mkdir -p docs
+          
+          # Generate RDoc documentation
+          rdoc --output docs \
+              --force-update \
+              lib/**/*.rb \
+              README.md CHANGELOG.md LICENSE.txt
+          
+          # Handle index.html
+          if [ -f docs/README_md.html ]; then
+            cp docs/README_md.html docs/index.html
+          elif [ -f docs/table_of_contents.html ]; then
+            cp docs/table_of_contents.html docs/index.html
+          else
+            cat > docs/index.html << EOL
+              <!DOCTYPE html>
+              <html>
+                <head>
+                  <title>CalInvite - Calendar Invite Generator by DashAPI</title>
+                </head>
+                <body>
+                  <h1>CalInvite Documentation</h1>
+                  <p>Welcome to the CalInvite documentation.</p>
+                  <p><a href="table_of_contents.html">Table of Contents</a></p>
+                </body>
+              </html>
+              EOL
+          fi
+      
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+      
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: 'docs'
+          name: github-pages
+          retention-days: 1
+      
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
