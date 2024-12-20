@@ -53,15 +53,21 @@ jobs:
       
       - name: Generate Documentation
         run: |
-          # Clean and create docs directory
-          rm -rf docs
-          mkdir -p docs
+          # Ensure clean slate
+          rm -rf docs rdoc
           
-          # Generate RDoc documentation
-          rdoc --output docs \
+          # First generate docs in a temporary directory
+          rdoc --output rdoc \
               --force-update \
               lib/**/*.rb \
               README.md CHANGELOG.md LICENSE.txt
+          
+          # Create final docs directory
+          mkdir docs
+          
+          # Move generated docs to final location
+          mv rdoc/* docs/
+          rm -rf rdoc
           
           # Handle index.html
           if [ -f docs/README_md.html ]; then
