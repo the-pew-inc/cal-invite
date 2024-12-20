@@ -17,7 +17,7 @@ jobs:
   test:
     name: Test
     runs-on: ubuntu-latest
-    permissions: 
+    permissions:
       contents: read
     strategy:
       matrix:
@@ -72,11 +72,11 @@ jobs:
     name: Generate and Deploy Documentation
     needs: build
     runs-on: ubuntu-latest
+    # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
     permissions:
       contents: read
       pages: write
       id-token: write
-      actions: read
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -91,41 +91,54 @@ jobs:
       - name: Install RDoc
         run: gem install rdoc
       
+      - name: Clean docs directory
+        run: rm -rf docs
+      
       - name: Generate Documentation
         run: |
-          # Generate RDoc documentation
-          rdoc --output docs \
+          # Create fresh docs directory
+          mkdir -p docs
+          
+          # Generate RDoc documentation using .rdoc_options
+          rdoc --op docs \
                --force-update \
+               --load-template --template=html \
                lib/**/*.rb \
                README.md CHANGELOG.md LICENSE.txt
           
-          # Ensure proper index.html exists
-          if [ -f docs/README_md.html ]; then
-            # If README was processed, use it as index
-            cp docs/README_md.html docs/index.html
-          elif [ -f docs/table_of_contents.html ]; then
-            # Fall back to table of contents
-            cp docs/table_of_contents.html docs/index.html
-          else
-            # Create a basic index if neither exists
-            cat > docs/index.html << EOL
-            <!DOCTYPE html>
-            <html>
-              <head>
-                <title>CalInvite - Calendar Invite Generator by DashAPI</title>
-              </head>
-              <body>
-                <h1>CalInvite Documentation</h1>
-                <p>Welcome to the CalInvite documentation.</p>
-                <p><a href="table_of_contents.html">Go to Table of Contents</a></p>
-              </body>
-            </html>
-            EOL
-          fi
-          
-          # Debug: Show what files we have
-          echo "Contents of docs directory:"
+          # Debug: Show generated files
+          echo "Generated files in docs directory:"
           ls -la docs/
+          
+          # Ensure index.html exists
+          if [ ! -f docs/index.html ]; then
+            if [ -f docs/README_md.html ]; then
+              cp docs/README_md.html docs/index.html
+            elif [ -f docs/table_of_contents.html ]; then
+              cp docs/table_of_contents.html docs/index.html
+            else
+              echo "Creating default index.html"
+              cat > docs/index.html << 'EOL'
+              <!DOCTYPE html>
+              <html>
+                <head>
+                  <meta charset="UTF-8">
+                  <title>CalInvite - Calendar Invite Generator by DashAPI</title>
+                </head>
+                <body>
+                  <h1>CalInvite Documentation</h1>
+                  <p>Welcome to the CalInvite documentation.</p>
+                  <nav>
+                    <ul>
+                      <li><a href="table_of_contents.html">Table of Contents</a></li>
+                      <li><a href="README_md.html">README</a></li>
+                    </ul>
+                  </nav>
+                </body>
+              </html>
+              EOL
+            fi
+          fi
       
       - name: Setup Pages
         uses: actions/configure-pages@v4
@@ -134,7 +147,7 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           path: 'docs'
-      
+          
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
