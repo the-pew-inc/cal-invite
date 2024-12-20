@@ -2,6 +2,10 @@
 
 ## [Released]
 
+## [v0.1.6] - 2024-12-20
+
+- Adding Mailer example
+
 ## [v0.1.5] - 2024-12-19
 
 - Should deploy the doc to a GitHub page

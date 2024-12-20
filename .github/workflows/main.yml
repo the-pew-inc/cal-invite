@@ -72,7 +72,6 @@ jobs:
     name: Generate and Deploy Documentation
     needs: build
     runs-on: ubuntu-latest
-    # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
     permissions:
       contents: read
       pages: write
@@ -81,7 +80,15 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
+      # Add this step first to clean up any existing artifacts
+      - name: Delete existing artifacts
+        uses: geekyeggo/delete-artifact@v2
+        with:
+          name: github-pages
+          failOnError: false
+
       - uses: actions/checkout@v3
+      
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
@@ -91,54 +98,42 @@ jobs:
       - name: Install RDoc
         run: gem install rdoc
       
-      - name: Clean docs directory
-        run: rm -rf docs
-      
       - name: Generate Documentation
         run: |
-          # Create fresh docs directory
+          # Clean and create docs directory
+          rm -rf docs
           mkdir -p docs
           
-          # Generate RDoc documentation using .rdoc_options
-          rdoc --op docs \
-               --force-update \
-               --load-template --template=html \
-               lib/**/*.rb \
-               README.md CHANGELOG.md LICENSE.txt
+          # Generate RDoc documentation
+          rdoc --output docs \
+              --force-update \
+              lib/**/*.rb \
+              README.md CHANGELOG.md LICENSE.txt
           
-          # Debug: Show generated files
-          echo "Generated files in docs directory:"
-          ls -la docs/
-          
-          # Ensure index.html exists
-          if [ ! -f docs/index.html ]; then
-            if [ -f docs/README_md.html ]; then
-              cp docs/README_md.html docs/index.html
-            elif [ -f docs/table_of_contents.html ]; then
-              cp docs/table_of_contents.html docs/index.html
-            else
-              echo "Creating default index.html"
-              cat > docs/index.html << 'EOL'
+          # Handle index.html
+          if [ -f docs/README_md.html ]; then
+            cp docs/README_md.html docs/index.html
+          elif [ -f docs/table_of_contents.html ]; then
+            cp docs/table_of_contents.html docs/index.html
+          else
+            cat > docs/index.html << EOL
               <!DOCTYPE html>
               <html>
                 <head>
-                  <meta charset="UTF-8">
                   <title>CalInvite - Calendar Invite Generator by DashAPI</title>
                 </head>
                 <body>
                   <h1>CalInvite Documentation</h1>
                   <p>Welcome to the CalInvite documentation.</p>
-                  <nav>
-                    <ul>
-                      <li><a href="table_of_contents.html">Table of Contents</a></li>
-                      <li><a href="README_md.html">README</a></li>
-                    </ul>
-                  </nav>
+                  <p><a href="table_of_contents.html">Table of Contents</a></p>
                 </body>
               </html>
               EOL
-            fi
           fi
+          
+          # Debug output
+          echo "Documentation directory contents:"
+          ls -la docs/
       
       - name: Setup Pages
         uses: actions/configure-pages@v4
@@ -147,7 +142,9 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           path: 'docs'
-          
+          name: github-pages
+          retention-days: 1
+      
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
