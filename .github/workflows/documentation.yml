@@ -1,20 +1,14 @@
 name: Documentation
 
 on:
-  workflow_call:
+  workflow_call:  # Keep this to allow calling from main workflow
     inputs:
       ruby-version:
         description: 'Ruby version to use'
         required: false
         default: '3.3'
         type: string
-  workflow_dispatch:
-    inputs:
-      ruby-version:
-        description: 'Ruby version to use'
-        required: false
-        default: '3.3'
-        type: string
+  workflow_dispatch:  # Keep this for manual triggers
 
 permissions:
   contents: read
@@ -26,57 +20,38 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  docs:
+  build:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    
     steps:
-      - name: Delete existing artifacts
-        uses: geekyeggo/delete-artifact@v2
-        with:
-          name: github-pages
-          failOnError: false
-
-      - uses: actions/checkout@v3
-        with:
-          submodules: false  # Don't try to checkout submodules
+      - name: Checkout
+        uses: actions/checkout@v4
       
-      - name: Set up Ruby
+      - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: ${{ inputs.ruby-version }}
           bundler-cache: true
       
-      - name: Install RDoc
-        run: gem install rdoc
-      
-      - name: Generate Documentation
-        run: |
-          # Clean any existing documentation
-          rm -rf doc docs
-          
-          # Generate documentation (will create 'doc' directory)
-          bundle exec rake rdoc
-          
-          # Rename doc to docs (GitHub Pages expects 'docs')
-          mv doc docs
-          
-          # Debug: Show what we have
-          echo "Files in docs directory:"
-          ls -la docs/
-
       - name: Setup Pages
-        uses: actions/configure-pages@v4
+        id: pages
+        uses: actions/configure-pages@v5
+      
+      - name: Build with RDoc
+        run: |
+          rm -rf doc docs _site
+          bundle exec rake rdoc
+          mv doc _site
       
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
-        with:
-          path: 'docs'
-          name: github-pages
-          retention-days: 1
-      
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
