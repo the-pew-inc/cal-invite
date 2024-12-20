@@ -1,89 +1,15 @@
-name: Ruby Gem
-
-on:
-  push:
-    branches: ["main"]
-    tags:
-      - "v*"
-  pull_request:
-    branches: ["main"]
-
-# Allow one concurrent deployment
-concurrency:
-  group: "pages"
-  cancel-in-progress: true
-
-jobs:
-  test:
-    name: Test
-    runs-on: ubuntu-latest
-    permissions: 
-      contents: read
-    strategy:
-      matrix:
-        ruby-version: ["3.3"]
-        rails-version: ["6","7", "8"]
-      fail-fast: false
-    timeout-minutes: 60
-    steps:
-      - uses: actions/checkout@v3
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: ${{ matrix.ruby-version }}
-          bundler-cache: true
-      - name: Install dependencies
-        run: |
-          bundle config path vendor/bundle
-          BUNDLE_GEMFILE=gemfiles/Gemfile.rails${{ matrix.rails-version }} bundle install
-      - name: Run tests
-        run: |
-          BUNDLE_GEMFILE=gemfiles/Gemfile.rails${{ matrix.rails-version }} bundle exec rake test
-
-  build:
-    name: Build + Publish
-    needs: test
-    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-    steps:
-      - uses: actions/checkout@v3
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: 3.3
-          bundler-cache: true
-      - name: Prepare for publishing
-        run: |
-          mkdir -p $HOME/.gem
-          touch $HOME/.gem/credentials
-          chmod 0600 $HOME/.gem/credentials
-          printf -- "---\n:rubygems_api_key: ${GEM_HOST_API_KEY}\n" > $HOME/.gem/credentials
-      - name: Build and publish
-        run: |
-          gem build *.gemspec
-          gem push *.gem
-        env:
-          GEM_HOST_API_KEY: "${{secrets.RUBYGEMS_AUTH_TOKEN}}"
-
-  documentation:
+documentation:
     name: Generate and Deploy Documentation
     needs: build
     runs-on: ubuntu-latest
-    # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
     permissions:
       contents: read
-      pages: write      # Required for deployment to Pages
-      id-token: write   # Required for verification
-      actions: read     # Required for reading workflow artifacts
-    
-    # Environment for GitHub Pages deployment
+      pages: write
+      id-token: write
+      actions: read
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    
     steps:
       - uses: actions/checkout@v3
       - name: Set up Ruby
@@ -97,7 +23,39 @@ jobs:
       
       - name: Generate Documentation
         run: |
-          rdoc --op docs --all --line-numbers --charset=UTF-8 --format=html --visibility=public lib/**/*.rb
+          # Generate RDoc documentation
+          rdoc --output docs \
+               --force-update \
+               lib/**/*.rb \
+               README.md CHANGELOG.md LICENSE.txt
+          
+          # Ensure proper index.html exists
+          if [ -f docs/README_md.html ]; then
+            # If README was processed, use it as index
+            cp docs/README_md.html docs/index.html
+          elif [ -f docs/table_of_contents.html ]; then
+            # Fall back to table of contents
+            cp docs/table_of_contents.html docs/index.html
+          else
+            # Create a basic index if neither exists
+            cat > docs/index.html << EOL
+            <!DOCTYPE html>
+            <html>
+              <head>
+                <title>CalInvite - Calendar Invite Generator by DashAPI</title>
+              </head>
+              <body>
+                <h1>CalInvite Documentation</h1>
+                <p>Welcome to the CalInvite documentation.</p>
+                <p><a href="table_of_contents.html">Go to Table of Contents</a></p>
+              </body>
+            </html>
+            EOL
+          fi
+          
+        # Debug: Show what files we have
+        echo "Contents of docs directory:"
+        ls -la docs/
       
       - name: Setup Pages
         uses: actions/configure-pages@v4

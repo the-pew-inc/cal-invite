@@ -6,7 +6,7 @@ exclude: ["vendor/*", "tmp/*", ".*/*"]
 hyperlink_all: true
 line_numbers: true
 locale: en
-main: README.md
+main: README.md  # This makes README.md the main page
 markup: markdown
 output_decoration: true
 show_hash: false
@@ -15,6 +15,10 @@ template_stylesheets: []
 title: "CalInvite - Calendar Invite Generator by DashAPI"
 visibility: :public
 webcvs: https://github.com/the-pew-inc/cal-invite
+
+# Adding explicit index generation
+generate_index: true  # Add this line
+index_name: index.html  # Add this line
 
 # Custom sections for better organization
 sections:
