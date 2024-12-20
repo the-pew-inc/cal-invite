@@ -1,14 +1,14 @@
 name: Documentation
 
 on:
-  workflow_call:  # This allows the workflow to be called by other workflows
+  workflow_call:
     inputs:
       ruby-version:
         description: 'Ruby version to use'
         required: false
         default: '3.3'
         type: string
-  workflow_dispatch:  # This allows manual triggering
+  workflow_dispatch:
     inputs:
       ruby-version:
         description: 'Ruby version to use'
@@ -21,7 +21,6 @@ permissions:
   pages: write
   id-token: write
 
-# Allow one concurrent deployment
 concurrency:
   group: "pages"
   cancel-in-progress: true
@@ -53,41 +52,21 @@ jobs:
       
       - name: Generate Documentation
         run: |
-          # Ensure clean slate
-          rm -rf docs rdoc
+          # Clean any existing docs
+          rm -rf docs
           
-          # First generate docs in a temporary directory
-          rdoc --output rdoc \
-              --force-update \
-              lib/**/*.rb \
-              README.md CHANGELOG.md LICENSE.txt
-          
-          # Create final docs directory
-          mkdir docs
-          
-          # Move generated docs to final location
-          mv rdoc/* docs/
-          rm -rf rdoc
-          
-          # Handle index.html
-          if [ -f docs/README_md.html ]; then
-            cp docs/README_md.html docs/index.html
-          elif [ -f docs/table_of_contents.html ]; then
-            cp docs/table_of_contents.html docs/index.html
-          else
-            cat > docs/index.html << EOL
-              <!DOCTYPE html>
-              <html>
-                <head>
-                  <title>CalInvite - Calendar Invite Generator by DashAPI</title>
-                </head>
-                <body>
-                  <h1>CalInvite Documentation</h1>
-                  <p>Welcome to the CalInvite documentation.</p>
-                  <p><a href="table_of_contents.html">Table of Contents</a></p>
-                </body>
-              </html>
-              EOL
+          # Generate documentation using .rdoc_options
+          rdoc --output docs \
+              --force-update
+
+          # Ensure index.html exists (RDoc should have created it based on .rdoc_options)
+          if [ ! -f docs/index.html ]; then
+            # If RDoc didn't create index.html, copy from README or table_of_contents
+            if [ -f docs/README_md.html ]; then
+              cp docs/README_md.html docs/index.html
+            elif [ -f docs/table_of_contents.html ]; then
+              cp docs/table_of_contents.html docs/index.html
+            fi
           fi
       
       - name: Setup Pages
