@@ -54,44 +54,19 @@ jobs:
       
       - name: Generate Documentation
         run: |
-          # Clean any existing docs
-          rm -rf docs
+          # Clean any existing documentation
+          rm -rf doc docs
           
-          # Create docs directory
-          mkdir -p docs
+          # Generate documentation (will create 'doc' directory)
+          bundle exec rake rdoc
           
-          # Generate API documentation in a subdirectory
-          rdoc --output docs/api \
-              --force-update
+          # Rename doc to docs (GitHub Pages expects 'docs')
+          mv doc docs
           
-          # Create root index.html that redirects to API docs
-          cat > docs/index.html << 'EOL'
-            <!DOCTYPE html>
-            <html>
-              <head>
-                <title>CalInvite - Calendar Invite Generator by DashAPI</title>
-                <meta http-equiv="refresh" content="0;url=api/index.html">
-                <style>
-                  body {
-                    font-family: system-ui, -apple-system, sans-serif;
-                    max-width: 800px;
-                    margin: 2rem auto;
-                    padding: 0 1rem;
-                  }
-                  .container {
-                    text-align: center;
-                  }
-                </style>
-              </head>
-              <body>
-                <div class="container">
-                  <h1>CalInvite Documentation</h1>
-                  <p>Redirecting to <a href="api/index.html">API documentation</a>...</p>
-                </div>
-              </body>
-            </html>
-            EOL
-      
+          # Debug: Show what we have
+          echo "Files in docs directory:"
+          ls -la docs/
+
       - name: Setup Pages
         uses: actions/configure-pages@v4
       
