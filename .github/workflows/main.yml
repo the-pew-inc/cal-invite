@@ -79,7 +79,8 @@ jobs:
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
     uses: ./.github/workflows/documentation.yml
     permissions:
-      pages: write      # Added this
-      id-token: write   # Added this
+      contents: read    # Add this line
+      pages: write
+      id-token: write
     with:
       ruby-version: "3.3"
