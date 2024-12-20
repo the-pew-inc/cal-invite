@@ -40,6 +40,8 @@ jobs:
           failOnError: false
 
       - uses: actions/checkout@v3
+        with:
+          submodules: false  # Don't try to checkout submodules
       
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
@@ -55,19 +57,40 @@ jobs:
           # Clean any existing docs
           rm -rf docs
           
-          # Generate documentation using .rdoc_options
-          rdoc --output docs \
+          # Create docs directory
+          mkdir -p docs
+          
+          # Generate API documentation in a subdirectory
+          rdoc --output docs/api \
               --force-update
-
-          # Ensure index.html exists (RDoc should have created it based on .rdoc_options)
-          if [ ! -f docs/index.html ]; then
-            # If RDoc didn't create index.html, copy from README or table_of_contents
-            if [ -f docs/README_md.html ]; then
-              cp docs/README_md.html docs/index.html
-            elif [ -f docs/table_of_contents.html ]; then
-              cp docs/table_of_contents.html docs/index.html
-            fi
-          fi
+          
+          # Create root index.html that redirects to API docs
+          cat > docs/index.html << 'EOL'
+            <!DOCTYPE html>
+            <html>
+              <head>
+                <title>CalInvite - Calendar Invite Generator by DashAPI</title>
+                <meta http-equiv="refresh" content="0;url=api/index.html">
+                <style>
+                  body {
+                    font-family: system-ui, -apple-system, sans-serif;
+                    max-width: 800px;
+                    margin: 2rem auto;
+                    padding: 0 1rem;
+                  }
+                  .container {
+                    text-align: center;
+                  }
+                </style>
+              </head>
+              <body>
+                <div class="container">
+                  <h1>CalInvite Documentation</h1>
+                  <p>Redirecting to <a href="api/index.html">API documentation</a>...</p>
+                </div>
+              </body>
+            </html>
+            EOL
       
       - name: Setup Pages
         uses: actions/configure-pages@v4
