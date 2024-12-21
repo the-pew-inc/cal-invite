@@ -1,7 +1,7 @@
 name: Documentation
 
 on:
-  workflow_call:  # Keep this to allow calling from main workflow
+  workflow_call:  # Keep this to allow calling from the main workflow
     inputs:
       ruby-version:
         description: 'Ruby version to use'
@@ -13,7 +13,7 @@ on:
 permissions:
   contents: read
   pages: write
-  id-token: write
+  id-token: write  # Necessary for GitHub Pages deployment
 
 concurrency:
   group: "pages"
@@ -32,14 +32,13 @@ jobs:
           ruby-version: '3.3'
           bundler-cache: true
       
-      - name: Setup Pages
-        id: pages
-        uses: actions/configure-pages@v5
-      
+      - name: Install RDoc
+        run: gem install rdoc
+
       - name: Build with RDoc
         run: |
           rm -rf doc docs _site
-          bundle exec rake rdoc
+          rdoc --output=doc
           mv doc _site
       
       - name: Upload artifact
