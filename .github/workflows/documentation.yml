@@ -40,7 +40,7 @@ jobs:
     - name: Install dependencies
       run: |
         rm -rf doc docs _site rdoc
-        gem install rdoc
+        gem install rdoc simplecov
 
     - name: Generate RDoc
       run: bundle exec rdoc
