@@ -1,14 +1,14 @@
 name: Documentation
 
 on:
-  workflow_call:  # Keep this to allow calling from the main workflow
+  workflow_call:  # Allow calling from the main workflow
     inputs:
       ruby-version:
         description: 'Ruby version to use'
         required: false
         default: '3.3'
         type: string
-  workflow_dispatch:  # Keep this for manual triggers
+  workflow_dispatch:  # Allow manual triggers
 
 permissions:
   contents: read
@@ -20,7 +20,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
- build-and-deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
     
     permissions:
@@ -31,6 +31,8 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+      with:
+        submodules: false  # Skip checking out submodules
 
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
@@ -44,7 +46,9 @@ jobs:
         gem install rdoc
 
     - name: Generate RDoc
-      run: bundle exec rdoc
+      run: |
+        # Exclude unnecessary directories during RDoc generation
+        bundle exec rdoc --exclude Example/calendar_app
 
     - name: Setup Pages
       uses: actions/configure-pages@v5
