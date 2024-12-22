@@ -52,13 +52,14 @@ jobs:
 
     - name: Install dependencies
       run: |
+        rm -f doc/created.rid
         rm -rf doc docs _site rdoc
         bundle install
         gem install rdoc
 
     - name: Generate RDoc
       run: |
-        bundle exec rdoc --exclude Example/calendar_app --op doc
+        bundle exec rdoc --exclude Example/calendar_app --op doc --force-update
 
     - name: Debug Deployment
       run: |
