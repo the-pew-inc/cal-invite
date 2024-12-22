@@ -35,23 +35,23 @@ jobs:
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: '3.0' # Adjust this to your project's Ruby version
+        ruby-version: '3.3' 
 
     - name: Install dependencies
       run: |
+        rm -rf doc docs _site rdoc
         gem install rdoc
-        # Add any other dependencies your project needs
 
     - name: Generate RDoc
-      run: rdoc --output=rdoc
+      run: bundle exec rdoc
 
     - name: Setup Pages
       uses: actions/configure-pages@v3
 
     - name: Upload artifact
-      uses: actions/upload-pages-artifact@v2
+      uses: actions/upload-pages-artifact@v4
       with:
-        path: 'rdoc'
+        path: 'doc/'
 
     - name: Deploy to GitHub Pages
       id: deployment
