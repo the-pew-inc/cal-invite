@@ -53,16 +53,18 @@ jobs:
       with:
         ruby-version: '3.3' 
 
+    - name: Cleanup Old Deployments
+      run: rm -rf doc/ _site/ || true
+
     - name: Install dependencies
       run: |
-        rm -rf doc docs _site rdoc
         bundle install
         gem install rdoc
 
     - name: Generate RDoc
       run: |
         # Exclude unnecessary directories during RDoc generation
-        bundle exec rdoc --exclude Example/calendar_app
+        bundle exec rdoc --exclude Example/calendar_app --op doc
 
     - name: Setup Pages
       uses: actions/configure-pages@v5
