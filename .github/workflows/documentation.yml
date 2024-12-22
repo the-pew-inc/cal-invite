@@ -1,19 +1,19 @@
 name: Documentation
 
 on:
-  workflow_call:  # Allow calling from the main workflow
+  workflow_call:
     inputs:
       ruby-version:
         description: 'Ruby version to use'
         required: false
         default: '3.3'
         type: string
-  workflow_dispatch:  # Allow manual triggers
+  workflow_dispatch:
 
 permissions:
   contents: read
   pages: write
-  id-token: write  # Necessary for GitHub Pages deployment
+  id-token: write
 
 concurrency:
   group: "pages"
@@ -22,7 +22,7 @@ concurrency:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    
+
     permissions:
       contents: write
       pages: write
@@ -31,40 +31,41 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-      with:
-        submodules: false  # Skip checking out submodules
 
     - name: Remove .gitmodules if exists
       run: |
-        # Remove .gitmodules and unstage it to prevent errors
         if [ -f .gitmodules ]; then
-          git rm --cached .gitmodules
-          rm .gitmodules
+          git rm --cached .gitmodules || true
+          rm .gitmodules || true
         fi
 
     - name: Clean up submodule references
       run: |
-        # Remove any submodule references from .git/config
         git submodule deinit -f --all || true
         git config --remove-section submodule.Example/calendar_app || true
+        rm -rf .git/modules/Example/calendar_app || true
 
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: '3.3' 
-
-    - name: Cleanup Old Deployments
-      run: rm -rf doc/ _site/ || true
+        ruby-version: '3.3'
 
     - name: Install dependencies
       run: |
+        rm -rf doc docs _site rdoc
         bundle install
         gem install rdoc
 
     - name: Generate RDoc
       run: |
-        # Exclude unnecessary directories during RDoc generation
         bundle exec rdoc --exclude Example/calendar_app --op doc
+
+    - name: Debug Deployment
+      run: |
+        echo "Current directory:"
+        pwd
+        echo "Contents of doc/:"
+        ls -la doc/
 
     - name: Setup Pages
       uses: actions/configure-pages@v5
@@ -77,6 +78,6 @@ jobs:
     - name: Deploy to GitHub Pages
       id: deployment
       uses: actions/deploy-pages@v4
-      
+
     - name: Output URL
       run: echo "Deployed to ${{ steps.deployment.outputs.page_url }}"
