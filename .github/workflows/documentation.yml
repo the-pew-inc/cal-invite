@@ -34,6 +34,20 @@ jobs:
       with:
         submodules: false  # Skip checking out submodules
 
+    - name: Remove .gitmodules if exists
+      run: |
+        # Remove .gitmodules and unstage it to prevent errors
+        if [ -f .gitmodules ]; then
+          git rm --cached .gitmodules
+          rm .gitmodules
+        fi
+
+    - name: Clean up submodule references
+      run: |
+        # Remove any submodule references from .git/config
+        git submodule deinit -f --all || true
+        git config --remove-section submodule.Example/calendar_app || true
+
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
