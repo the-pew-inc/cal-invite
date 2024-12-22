@@ -1,0 +1,85 @@
+<%# app/views/calendars/index.html.erb %>
+<div class="max-w-6xl mx-auto p-8">
+  <h1 class="text-3xl font-bold mb-8">Calendar Invite Examples</h1>
+  <!-- Send an Email -->
+  <div class="mb-8">
+    <%= button_to "Send Test Email Invitation", 
+                send_test_email_calendars_path, 
+                method: :post,
+                class: "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" %>
+  </div>
+  <!-- Simple Event -->
+  <div class="mb-12">
+    <h2 class="text-xl font-semibold mb-4">Simple Meeting (5 days from now)</h2>
+    <p class="text-gray-600 mb-4">
+      A basic event at Apple's historical headquarters with minimal attributes.
+      Start time: <%= @simple_event.start_time.in_time_zone(@simple_event.timezone).strftime("%B %d, %Y at %I:%M %p") %> PT
+    </p>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <% @providers.each do |provider| %>
+        <div class="p-4 border rounded-lg hover:bg-gray-50">
+          <h3 class="font-medium mb-2"><%= provider.to_s.sub('ics', 'ICS File').sub('ical', 'Apple Calendar').titleize %></h3>
+          <% if [:ics, :ical].include?(provider) %>
+            <%= link_to "Download Calendar File",
+                download_ics_calendars_path(event_type: 'simple', provider: provider),
+                class: "text-blue-600 hover:text-blue-800" %>
+          <% else %>
+            <%= link_to "Add to Calendar",
+                @simple_event.generate_calendar_url(provider),
+                class: "text-blue-600 hover:text-blue-800 break-all",
+                target: "_blank" %>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+  <!-- All Day Event -->
+  <div class="mb-12">
+    <h2 class="text-xl font-semibold mb-4">All-Day Event (10 days from now)</h2>
+    <p class="text-gray-600 mb-4">
+      A full-day event on <%= @all_day_event.start_time.in_time_zone(@all_day_event.timezone).strftime("%B %d, %Y") %>
+    </p>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <% @providers.each do |provider| %>
+        <div class="p-4 border rounded-lg hover:bg-gray-50">
+          <h3 class="font-medium mb-2"><%= provider.to_s.sub('ics', 'ICS File').sub('ical', 'Apple Calendar').titleize %></h3>
+          <% if [:ics, :ical].include?(provider) %>
+            <%= link_to "Download Calendar File",
+                download_ics_calendars_path(event_type: 'all_day', provider: provider),
+                class: "text-blue-600 hover:text-blue-800" %>
+          <% else %>
+            <%= link_to "Add to Calendar",
+                @all_day_event.generate_calendar_url(provider),
+                class: "text-blue-600 hover:text-blue-800 break-all",
+                target: "_blank" %>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+  <!-- Complete Event -->
+  <div class="mb-12">
+    <h2 class="text-xl font-semibold mb-4">Full Feature Event (15 days from now)</h2>
+    <p class="text-gray-600 mb-4">
+      A comprehensive event showcasing all available calendar invite features.
+      Start time: <%= @complete_event.start_time.in_time_zone(@complete_event.timezone).strftime("%B %d, %Y at %I:%M %p") %> PT
+    </p>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <% @providers.each do |provider| %>
+        <div class="p-4 border rounded-lg hover:bg-gray-50">
+          <h3 class="font-medium mb-2"><%= provider.to_s.sub('ics', 'ICS File').sub('ical', 'Apple Calendar').titleize %></h3>
+          <% if [:ics, :ical].include?(provider) %>
+            <%= link_to "Download Calendar File",
+                download_ics_calendars_path(event_type: 'complete', provider: provider),
+                class: "text-blue-600 hover:text-blue-800" %>
+          <% else %>
+            <%= link_to "Add to Calendar",
+                @complete_event.generate_calendar_url(provider),
+                class: "text-blue-600 hover:text-blue-800 break-all",
+                target: "_blank" %>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

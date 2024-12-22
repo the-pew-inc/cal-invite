@@ -1,0 +1,17 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//CalInvite//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+UID:1734718045-e98036a73bafdfbe@cal-invite
+DTSTAMP:20241220T180725Z
+DTSTART;TZID=America/Los_Angeles:20241225T170000
+DTEND;TZID=America/Los_Angeles:20241225T200000
+SUMMARY:Strategic Planning Meeting at Apple Park
+DESCRIPTION:Join us for our quarterly strategic planning session at Apple Park.\n\nAgenda:\n9:00 AM - 9:30 AM: Welcome & Coffee\n9:30 AM - 10:30 AM: Q4 Performance Review\n10:30 AM - 10:45 AM: Break\n10:45 AM - 11:30 AM: 2025 Strategy Discussion\n11:30 AM - 12:00 PM: Action Items & Next Steps\n\nPlease bring your laptop and any relevant materials.\n\nSecurity Notice:\nYou will need to check in at the Apple Park Visitor Center.\nPlease bring government-issued photo ID.\n\n\nNotes: Parking available at the Steve Jobs Theater parking structure.
+LOCATION:Apple Park\, 1 Apple Park Way\, Cupertino\, CA 95014
+URL:https://example.com/meeting-details
+ATTENDEE;RSVP=TRUE:mailto:attendee@example.com
+END:VEVENT
+END:VCALENDAR

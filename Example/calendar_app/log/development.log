@@ -1,0 +1,1009 @@
+Started GET "/" for ::1 at 2024-12-17 11:21:47 -0800
+  [1m[35m (0.2ms)[0m  [1m[35mCREATE TABLE "schema_migrations" ("version" varchar NOT NULL PRIMARY KEY) /*application='CalendarApp'*/[0m
+  [1m[35m (0.1ms)[0m  [1m[35mCREATE TABLE "ar_internal_metadata" ("key" varchar NOT NULL PRIMARY KEY, "value" varchar, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL) /*application='CalendarApp'*/[0m
+  [1m[36mActiveRecord::SchemaMigration Load (0.1ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC /*application='CalendarApp'*/[0m
+Processing by Rails::WelcomeController#index as HTML
+  Rendering /Users/spaquet/.frum/versions/3.3.3/lib/ruby/gems/3.3.0/gems/railties-8.0.1/lib/rails/templates/rails/welcome/index.html.erb
+  Rendered /Users/spaquet/.frum/versions/3.3.3/lib/ruby/gems/3.3.0/gems/railties-8.0.1/lib/rails/templates/rails/welcome/index.html.erb (Duration: 0.6ms | GC: 0.3ms)
+Completed 200 OK in 64ms (Views: 3.9ms | ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 4.2ms)
+
+
+Started GET "/" for ::1 at 2024-12-17 11:28:47 -0800
+  [1m[36mActiveRecord::SchemaMigration Load (0.0ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC /*application='CalendarApp'*/[0m
+Processing by CalendarsController#index as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering calendars/index.html.erb within layouts/application
+  Rendered calendars/index.html.erb within layouts/application (Duration: 0.6ms | GC: 0.5ms)
+  Rendered layout layouts/application.html.erb (Duration: 18.4ms | GC: 7.2ms)
+Completed 200 OK in 89ms (Views: 21.6ms | ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 16.1ms)
+
+
+Started GET "/assets/tailwind-7c481122.css" for ::1 at 2024-12-17 11:28:47 -0800
+Started GET "/assets/inter-font-1d90a608.css" for ::1 at 2024-12-17 11:28:47 -0800
+Started GET "/assets/application-8b441ae0.css" for ::1 at 2024-12-17 11:28:47 -0800
+Started GET "/assets/application.tailwind-46ffc28d.css" for ::1 at 2024-12-17 11:28:48 -0800
+Started GET "/assets/turbo.min-fae85750.js" for ::1 at 2024-12-17 11:28:48 -0800
+Started GET "/assets/application-bfcdf840.js" for ::1 at 2024-12-17 11:28:48 -0800
+Started GET "/assets/stimulus-loading-1fc53fe7.js" for ::1 at 2024-12-17 11:28:48 -0800
+Started GET "/assets/controllers/index-ee64e1f1.js" for ::1 at 2024-12-17 11:28:48 -0800
+Started GET "/assets/Inter-roman.latin.var-cfeef184.woff2" for ::1 at 2024-12-17 11:28:48 -0800
+Started GET "/assets/stimulus.min-4b1e420e.js" for ::1 at 2024-12-17 11:28:48 -0800
+Started GET "/assets/controllers/application-3affb389.js" for ::1 at 2024-12-17 11:28:48 -0800
+Started GET "/assets/controllers/hello_controller-708796bd.js" for ::1 at 2024-12-17 11:28:48 -0800
+Started GET "/" for ::1 at 2024-12-17 11:30:33 -0800
+Processing by CalendarsController#index as HTML
+Completed 500 Internal Server Error in 38ms (ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 7.1ms)
+
+
+  
+NameError (uninitialized constant CalendarsController::CalInvite):
+  
+app/controllers/calendars_controller.rb:15:in `create_simple_event'
+app/controllers/calendars_controller.rb:6:in `index'
+Started GET "/" for ::1 at 2024-12-17 11:31:55 -0800
+Processing by CalendarsController#index as HTML
+Completed 500 Internal Server Error in 44ms (ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.0ms)
+
+
+  
+NameError (uninitialized constant CalendarsController::CalInvite):
+  
+app/controllers/calendars_controller.rb:15:in `create_simple_event'
+app/controllers/calendars_controller.rb:6:in `index'
+Started GET "/" for ::1 at 2024-12-17 11:32:06 -0800
+  [1m[36mActiveRecord::SchemaMigration Load (0.0ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC /*application='CalendarApp'*/[0m
+Processing by CalendarsController#index as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering calendars/index.html.erb within layouts/application
+  Rendered calendars/index.html.erb within layouts/application (Duration: 12.9ms | GC: 7.0ms)
+  Rendered layout layouts/application.html.erb (Duration: 25.7ms | GC: 7.8ms)
+Completed 200 OK in 86ms (Views: 28.5ms | ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 15.7ms)
+
+
+Started GET "/assets/tailwind-92a95c28.css" for ::1 at 2024-12-17 11:32:06 -0800
+Started GET "/" for ::1 at 2024-12-17 12:46:20 -0800
+  [1m[36mActiveRecord::SchemaMigration Load (0.0ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC /*application='CalendarApp'*/[0m
+Processing by CalendarsController#index as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering calendars/index.html.erb within layouts/application
+  Rendered calendars/index.html.erb within layouts/application (Duration: 2.3ms | GC: 0.1ms)
+  Rendered layout layouts/application.html.erb (Duration: 14.1ms | GC: 0.2ms)
+Completed 200 OK in 74ms (Views: 15.7ms | ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 5.4ms)
+
+
+Started GET "/" for ::1 at 2024-12-17 12:59:40 -0800
+  [1m[36mActiveRecord::SchemaMigration Load (0.1ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC /*application='CalendarApp'*/[0m
+Processing by CalendarsController#index as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering calendars/index.html.erb within layouts/application
+  Rendered calendars/index.html.erb within layouts/application (Duration: 4.8ms | GC: 0.3ms)
+  Rendered layout layouts/application.html.erb (Duration: 4.9ms | GC: 0.3ms)
+Completed 500 Internal Server Error in 68ms (ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 9.5ms)
+
+
+  
+ActionView::Template::Error ("+HH:MM", "-HH:MM", "UTC" or "A".."I","K".."Z" expected for utc_offset: America/Los_Angeles)
+Caused by: ArgumentError ("+HH:MM", "-HH:MM", "UTC" or "A".."I","K".."Z" expected for utc_offset: America/Los_Angeles)
+
+Information for: ActionView::Template::Error ("+HH:MM", "-HH:MM", "UTC" or "A".."I","K".."Z" expected for utc_offset: America/Los_Angeles):
+    15:         <% @providers.each do |provider| %>
+    16:           <div class="p-4 border rounded-lg hover:bg-gray-50">
+    17:             <h3 class="font-medium mb-2"><%= provider.to_s.sub('ics', 'ICS File').titleize %></h3>
+    18:             <a href="<%= @simple_event.calendar_url(provider) %>" 
+    19:              class="text-blue-600 hover:text-blue-800 break-all"
+    20:              target="_blank">
+    21:               Add to Calendar
+  
+app/views/calendars/index.html.erb:18
+app/views/calendars/index.html.erb:15:in `each'
+app/views/calendars/index.html.erb:15
+
+Information for cause: ArgumentError ("+HH:MM", "-HH:MM", "UTC" or "A".."I","K".."Z" expected for utc_offset: America/Los_Angeles):
+  
+app/views/calendars/index.html.erb:18
+app/views/calendars/index.html.erb:15:in `each'
+app/views/calendars/index.html.erb:15
+Started GET "/" for ::1 at 2024-12-18 12:22:58 -0800
+  [1m[36mActiveRecord::SchemaMigration Load (0.1ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC /*application='CalendarApp'*/[0m
+Processing by CalendarsController#index as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering calendars/index.html.erb within layouts/application
+  Rendered calendars/index.html.erb within layouts/application (Duration: 6.3ms | GC: 0.2ms)
+  Rendered layout layouts/application.html.erb (Duration: 6.4ms | GC: 0.2ms)
+Completed 500 Internal Server Error in 75ms (ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 10.0ms)
+
+
+  
+ActionView::Template::Error ("+HH:MM", "-HH:MM", "UTC" or "A".."I","K".."Z" expected for utc_offset: America/Los_Angeles)
+Caused by: ArgumentError ("+HH:MM", "-HH:MM", "UTC" or "A".."I","K".."Z" expected for utc_offset: America/Los_Angeles)
+
+Information for: ActionView::Template::Error ("+HH:MM", "-HH:MM", "UTC" or "A".."I","K".."Z" expected for utc_offset: America/Los_Angeles):
+    15:         <% @providers.each do |provider| %>
+    16:           <div class="p-4 border rounded-lg hover:bg-gray-50">
+    17:             <h3 class="font-medium mb-2"><%= provider.to_s.sub('ics', 'ICS File').titleize %></h3>
+    18:             <a href="<%= @simple_event.calendar_url(provider) %>" 
+    19:              class="text-blue-600 hover:text-blue-800 break-all"
+    20:              target="_blank">
+    21:               Add to Calendar
+  
+app/views/calendars/index.html.erb:18
+app/views/calendars/index.html.erb:15:in `each'
+app/views/calendars/index.html.erb:15
+
+Information for cause: ArgumentError ("+HH:MM", "-HH:MM", "UTC" or "A".."I","K".."Z" expected for utc_offset: America/Los_Angeles):
+  
+app/views/calendars/index.html.erb:18
+app/views/calendars/index.html.erb:15:in `each'
+app/views/calendars/index.html.erb:15
+Started GET "/" for ::1 at 2024-12-18 22:06:58 -0800
+  [1m[36mActiveRecord::SchemaMigration Load (0.1ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC /*application='CalendarApp'*/[0m
+Processing by CalendarsController#index as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering calendars/index.html.erb within layouts/application
+  Rendered calendars/index.html.erb within layouts/application (Duration: 1.1ms | GC: 0.2ms)
+  Rendered layout layouts/application.html.erb (Duration: 1.2ms | GC: 0.2ms)
+Completed 500 Internal Server Error in 68ms (ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 8.9ms)
+
+
+  
+ActionView::Template::Error (undefined method `capitalize_provider' for an instance of CalInvite::Event)
+Caused by: NoMethodError (undefined method `capitalize_provider' for an instance of CalInvite::Event)
+
+Information for: ActionView::Template::Error (undefined method `capitalize_provider' for an instance of CalInvite::Event):
+    15:         <% @providers.each do |provider| %>
+    16:           <div class="p-4 border rounded-lg hover:bg-gray-50">
+    17:             <h3 class="font-medium mb-2"><%= provider.to_s.sub('ics', 'ICS File').titleize %></h3>
+    18:             <a href="<%= @simple_event.calendar_url(provider) %>" 
+    19:              class="text-blue-600 hover:text-blue-800 break-all"
+    20:              target="_blank">
+    21:               Add to Calendar
+  
+app/views/calendars/index.html.erb:18
+app/views/calendars/index.html.erb:15:in `each'
+app/views/calendars/index.html.erb:15
+
+Information for cause: NoMethodError (undefined method `capitalize_provider' for an instance of CalInvite::Event):
+  
+app/views/calendars/index.html.erb:18
+app/views/calendars/index.html.erb:15:in `each'
+app/views/calendars/index.html.erb:15
+Started GET "/" for ::1 at 2024-12-18 22:09:23 -0800
+Processing by CalendarsController#index as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering calendars/index.html.erb within layouts/application
+  Rendered calendars/index.html.erb within layouts/application (Duration: 0.6ms | GC: 0.2ms)
+  Rendered layout layouts/application.html.erb (Duration: 0.7ms | GC: 0.2ms)
+Completed 500 Internal Server Error in 41ms (ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.2ms)
+
+
+  
+ActionView::Template::Error (undefined method `capitalize_provider' for an instance of CalInvite::Event)
+Caused by: NoMethodError (undefined method `capitalize_provider' for an instance of CalInvite::Event)
+
+Information for: ActionView::Template::Error (undefined method `capitalize_provider' for an instance of CalInvite::Event):
+    15:         <% @providers.each do |provider| %>
+    16:           <div class="p-4 border rounded-lg hover:bg-gray-50">
+    17:             <h3 class="font-medium mb-2"><%= provider.to_s.sub('ics', 'ICS File').titleize %></h3>
+    18:             <a href="<%= @simple_event.calendar_url(provider) %>" 
+    19:              class="text-blue-600 hover:text-blue-800 break-all"
+    20:              target="_blank">
+    21:               Add to Calendar
+  
+app/views/calendars/index.html.erb:18
+app/views/calendars/index.html.erb:15:in `each'
+app/views/calendars/index.html.erb:15
+
+Information for cause: NoMethodError (undefined method `capitalize_provider' for an instance of CalInvite::Event):
+  
+app/views/calendars/index.html.erb:18
+app/views/calendars/index.html.erb:15:in `each'
+app/views/calendars/index.html.erb:15
+Started GET "/" for ::1 at 2024-12-18 22:09:38 -0800
+  [1m[36mActiveRecord::SchemaMigration Load (0.1ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC /*application='CalendarApp'*/[0m
+Processing by CalendarsController#index as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering calendars/index.html.erb within layouts/application
+  Rendered calendars/index.html.erb within layouts/application (Duration: 1.1ms | GC: 0.2ms)
+  Rendered layout layouts/application.html.erb (Duration: 1.2ms | GC: 0.2ms)
+Completed 500 Internal Server Error in 65ms (ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 8.1ms)
+
+
+  
+ActionView::Template::Error (wrong number of arguments (given 1, expected 0))
+Caused by: ArgumentError (wrong number of arguments (given 1, expected 0))
+
+Information for: ActionView::Template::Error (wrong number of arguments (given 1, expected 0)):
+    15:         <% @providers.each do |provider| %>
+    16:           <div class="p-4 border rounded-lg hover:bg-gray-50">
+    17:             <h3 class="font-medium mb-2"><%= provider.to_s.sub('ics', 'ICS File').titleize %></h3>
+    18:             <a href="<%= @simple_event.calendar_url(provider) %>" 
+    19:              class="text-blue-600 hover:text-blue-800 break-all"
+    20:              target="_blank">
+    21:               Add to Calendar
+  
+app/views/calendars/index.html.erb:18
+app/views/calendars/index.html.erb:15:in `each'
+app/views/calendars/index.html.erb:15
+
+Information for cause: ArgumentError (wrong number of arguments (given 1, expected 0)):
+  
+app/views/calendars/index.html.erb:18
+app/views/calendars/index.html.erb:15:in `each'
+app/views/calendars/index.html.erb:15
+Started GET "/" for ::1 at 2024-12-18 22:18:09 -0800
+Processing by CalendarsController#index as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering calendars/index.html.erb within layouts/application
+  Rendered calendars/index.html.erb within layouts/application (Duration: 2.0ms | GC: 1.3ms)
+  Rendered layout layouts/application.html.erb (Duration: 2.6ms | GC: 1.8ms)
+Completed 500 Internal Server Error in 36ms (ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 3.1ms)
+
+
+  
+ActionView::Template::Error (wrong number of arguments (given 1, expected 0))
+Caused by: ArgumentError (wrong number of arguments (given 1, expected 0))
+
+Information for: ActionView::Template::Error (wrong number of arguments (given 1, expected 0)):
+    18:                 class: "text-blue-600 hover:text-blue-800" %>
+    19:           <% else %>
+    20:             <%= link_to "Add to Calendar",
+    21:                 @simple_event.calendar_url(provider),
+    22:                 class: "text-blue-600 hover:text-blue-800 break-all",
+    23:                 target: "_blank" %>
+    24:           <% end %>
+  
+app/views/calendars/index.html.erb:21
+app/views/calendars/index.html.erb:12:in `each'
+app/views/calendars/index.html.erb:12
+
+Information for cause: ArgumentError (wrong number of arguments (given 1, expected 0)):
+  
+app/views/calendars/index.html.erb:21
+app/views/calendars/index.html.erb:12:in `each'
+app/views/calendars/index.html.erb:12
+Started GET "/" for ::1 at 2024-12-18 22:36:04 -0800
+Processing by CalendarsController#index as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering calendars/index.html.erb within layouts/application
+  Rendered calendars/index.html.erb within layouts/application (Duration: 0.7ms | GC: 0.1ms)
+  Rendered layout layouts/application.html.erb (Duration: 0.8ms | GC: 0.1ms)
+Completed 500 Internal Server Error in 31ms (ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.1ms)
+
+
+  
+ActionView::Template::Error (wrong number of arguments (given 1, expected 0))
+Caused by: ArgumentError (wrong number of arguments (given 1, expected 0))
+
+Information for: ActionView::Template::Error (wrong number of arguments (given 1, expected 0)):
+    20:             <%= link_to "Add to Calendar",
+    21:             @simple_event.calendar_url(provider),
+    22:             class: "text-blue-600 hover:text-blue-800 break-all",
+    23:             target: "_blank" if @simple_event.calendar_url(provider) %>
+    24:           <% end %>
+    25:         </div>
+    26:       <% end %>
+  
+app/views/calendars/index.html.erb:23
+app/views/calendars/index.html.erb:12:in `each'
+app/views/calendars/index.html.erb:12
+
+Information for cause: ArgumentError (wrong number of arguments (given 1, expected 0)):
+  
+app/views/calendars/index.html.erb:23
+app/views/calendars/index.html.erb:12:in `each'
+app/views/calendars/index.html.erb:12
+Started GET "/" for ::1 at 2024-12-18 22:37:36 -0800
+Processing by CalendarsController#index as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering calendars/index.html.erb within layouts/application
+  Rendered calendars/index.html.erb within layouts/application (Duration: 0.6ms | GC: 0.0ms)
+  Rendered layout layouts/application.html.erb (Duration: 0.7ms | GC: 0.0ms)
+Completed 500 Internal Server Error in 32ms (ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.2ms)
+
+
+  
+ActionView::Template::Error (wrong number of arguments (given 1, expected 0))
+Caused by: ArgumentError (wrong number of arguments (given 1, expected 0))
+
+Information for: ActionView::Template::Error (wrong number of arguments (given 1, expected 0)):
+    17:                 download_ics_calendar_path(event_type: 'simple'),
+    18:                 class: "text-blue-600 hover:text-blue-800" %>
+    19:           <% else %>
+    20:             <% calendar_url = @simple_event.calendar_url(provider) %>
+    21:             <%= link_to "Add to Calendar",
+    22:                 calendar_url,
+    23:                 class: "text-blue-600 hover:text-blue-800 break-all",
+  
+app/views/calendars/index.html.erb:20
+app/views/calendars/index.html.erb:12:in `each'
+app/views/calendars/index.html.erb:12
+
+Information for cause: ArgumentError (wrong number of arguments (given 1, expected 0)):
+  
+app/views/calendars/index.html.erb:20
+app/views/calendars/index.html.erb:12:in `each'
+app/views/calendars/index.html.erb:12
+Started GET "/" for ::1 at 2024-12-18 22:40:24 -0800
+Processing by CalendarsController#index as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering calendars/index.html.erb within layouts/application
+  Rendered calendars/index.html.erb within layouts/application (Duration: 0.8ms | GC: 0.0ms)
+  Rendered layout layouts/application.html.erb (Duration: 0.9ms | GC: 0.0ms)
+Completed 500 Internal Server Error in 33ms (ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.2ms)
+
+
+  
+ActionView::Template::Error (undefined method `for_provider' for an instance of CalInvite::Event)
+Caused by: NoMethodError (undefined method `for_provider' for an instance of CalInvite::Event)
+
+Information for: ActionView::Template::Error (undefined method `for_provider' for an instance of CalInvite::Event):
+    18:                 class: "text-blue-600 hover:text-blue-800" %>
+    19:           <% else %>
+    20:             <%= link_to "Add to Calendar",
+    21:                 @simple_event.for_provider(provider).calendar_url,
+    22:                 class: "text-blue-600 hover:text-blue-800 break-all",
+    23:                 target: "_blank" %>
+    24:           <% end %>
+  
+app/views/calendars/index.html.erb:21
+app/views/calendars/index.html.erb:12:in `each'
+app/views/calendars/index.html.erb:12
+
+Information for cause: NoMethodError (undefined method `for_provider' for an instance of CalInvite::Event):
+  
+app/views/calendars/index.html.erb:21
+app/views/calendars/index.html.erb:12:in `each'
+app/views/calendars/index.html.erb:12
+Started GET "/" for ::1 at 2024-12-18 22:41:30 -0800
+Processing by CalendarsController#index as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering calendars/index.html.erb within layouts/application
+  Rendered calendars/index.html.erb within layouts/application (Duration: 1.0ms | GC: 0.3ms)
+  Rendered layout layouts/application.html.erb (Duration: 1.0ms | GC: 0.3ms)
+Completed 500 Internal Server Error in 33ms (ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.3ms)
+
+
+  
+ActionView::Template::Error (wrong number of arguments (given 1, expected 0))
+Caused by: ArgumentError (wrong number of arguments (given 1, expected 0))
+
+Information for: ActionView::Template::Error (wrong number of arguments (given 1, expected 0)):
+    18:                 class: "text-blue-600 hover:text-blue-800" %>
+    19:           <% else %>
+    20:             <%= link_to "Add to Calendar",
+    21:                 @simple_event.calendar_url(provider),
+    22:                 class: "text-blue-600 hover:text-blue-800 break-all",
+    23:                 target: "_blank" %>
+    24:           <% end %>
+  
+app/views/calendars/index.html.erb:21
+app/views/calendars/index.html.erb:12:in `each'
+app/views/calendars/index.html.erb:12
+
+Information for cause: ArgumentError (wrong number of arguments (given 1, expected 0)):
+  
+app/views/calendars/index.html.erb:21
+app/views/calendars/index.html.erb:12:in `each'
+app/views/calendars/index.html.erb:12
+Started GET "/" for ::1 at 2024-12-18 22:44:01 -0800
+  [1m[36mActiveRecord::SchemaMigration Load (0.0ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC /*application='CalendarApp'*/[0m
+Processing by CalendarsController#index as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering calendars/index.html.erb within layouts/application
+  Rendered calendars/index.html.erb within layouts/application (Duration: 4.6ms | GC: 0.4ms)
+  Rendered layout layouts/application.html.erb (Duration: 4.7ms | GC: 0.4ms)
+Completed 500 Internal Server Error in 63ms (ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 6.8ms)
+
+
+  
+ActionView::Template::Error (undefined method `download_ics_calendar_path' for an instance of #<Class:0x000000011057b5f0>)
+Caused by: NoMethodError (undefined method `download_ics_calendar_path' for an instance of #<Class:0x000000011057b5f0>)
+
+Information for: ActionView::Template::Error (undefined method `download_ics_calendar_path' for an instance of #<Class:0x000000011057b5f0>):
+    14:           <h3 class="font-medium mb-2"><%= provider.to_s.sub('ics', 'ICS File').titleize %></h3>
+    15:           <% if provider == :ics %>
+    16:             <%= link_to "Download Calendar File",
+    17:                 download_ics_calendar_path(event_type: 'simple'),
+    18:                 class: "text-blue-600 hover:text-blue-800" %>
+    19:           <% else %>
+    20:             <%= link_to "Add to Calendar",
+  
+app/views/calendars/index.html.erb:17
+app/views/calendars/index.html.erb:12:in `each'
+app/views/calendars/index.html.erb:12
+
+Information for cause: NoMethodError (undefined method `download_ics_calendar_path' for an instance of #<Class:0x000000011057b5f0>):
+  
+app/views/calendars/index.html.erb:17
+app/views/calendars/index.html.erb:12:in `each'
+app/views/calendars/index.html.erb:12
+Started GET "/" for ::1 at 2024-12-18 22:46:14 -0800
+  [1m[36mActiveRecord::SchemaMigration Load (0.1ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC /*application='CalendarApp'*/[0m
+Processing by CalendarsController#index as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering calendars/index.html.erb within layouts/application
+  Rendered calendars/index.html.erb within layouts/application (Duration: 2.1ms | GC: 0.1ms)
+  Rendered layout layouts/application.html.erb (Duration: 14.5ms | GC: 0.1ms)
+Completed 200 OK in 72ms (Views: 16.0ms | ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 1.0ms)
+
+
+Started GET "/assets/tailwind-b129518e.css" for ::1 at 2024-12-18 22:46:14 -0800
+Started GET "/assets/application-8b441ae0.css" for ::1 at 2024-12-18 22:46:14 -0800
+Started GET "/assets/application-bfcdf840.js" for ::1 at 2024-12-18 22:46:14 -0800
+Started GET "/assets/turbo.min-fae85750.js" for ::1 at 2024-12-18 22:46:14 -0800
+Started GET "/assets/stimulus-loading-1fc53fe7.js" for ::1 at 2024-12-18 22:46:14 -0800
+Started GET "/assets/stimulus.min-4b1e420e.js" for ::1 at 2024-12-18 22:46:15 -0800
+Started GET "/assets/controllers/application-3affb389.js" for ::1 at 2024-12-18 22:46:15 -0800
+Started GET "/assets/controllers/index-ee64e1f1.js" for ::1 at 2024-12-18 22:46:15 -0800
+Started GET "/calendars/download_ics?event_type=simple" for ::1 at 2024-12-18 22:51:48 -0800
+Processing by CalendarsController#download_ics as HTML
+  Parameters: {"event_type"=>"simple"}
+Completed 500 Internal Server Error in 46ms (ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.0ms)
+
+
+  
+NameError (uninitialized constant CalInvite::Providers::IcsContent):
+  
+app/controllers/calendars_controller.rb:24:in `download_ics'
+Started GET "/" for ::1 at 2024-12-18 22:52:00 -0800
+Processing by CalendarsController#index as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering calendars/index.html.erb within layouts/application
+  Rendered calendars/index.html.erb within layouts/application (Duration: 1.0ms | GC: 0.0ms)
+  Rendered layout layouts/application.html.erb (Duration: 1.7ms | GC: 0.0ms)
+Completed 200 OK in 41ms (Views: 2.0ms | ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.0ms)
+
+
+Started GET "/assets/stimulus.min-2395e199.js.map" for ::1 at 2024-12-18 22:53:37 -0800
+Started GET "/assets/turbo.min-5dd5a71a.js.map" for ::1 at 2024-12-18 22:53:37 -0800
+Started GET "/" for ::1 at 2024-12-18 22:57:03 -0800
+  [1m[36mActiveRecord::SchemaMigration Load (0.0ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC /*application='CalendarApp'*/[0m
+Processing by CalendarsController#index as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering calendars/index.html.erb within layouts/application
+  Rendered calendars/index.html.erb within layouts/application (Duration: 3.2ms | GC: 0.4ms)
+  Rendered layout layouts/application.html.erb (Duration: 22.2ms | GC: 7.4ms)
+Completed 200 OK in 83ms (Views: 23.6ms | ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 13.7ms)
+
+
+Started GET "/calendars/download_ics?event_type=simple" for ::1 at 2024-12-18 23:03:00 -0800
+Processing by CalendarsController#download_ics as HTML
+  Parameters: {"event_type"=>"simple"}
+Completed 500 Internal Server Error in 45ms (ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 2.5ms)
+
+
+  
+NameError (uninitialized constant CalInvite::Providers::IcsContent):
+  
+app/controllers/calendars_controller.rb:24:in `download_ics'
+Started GET "/calendars/download_ics?event_type=simple" for ::1 at 2024-12-18 23:08:29 -0800
+Processing by CalendarsController#download_ics as HTML
+  Parameters: {"event_type"=>"simple"}
+Completed 500 Internal Server Error in 40ms (ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.0ms)
+
+
+  
+NameError (uninitialized constant CalInvite::Providers::IcsContent):
+  
+app/controllers/calendars_controller.rb:24:in `download_ics'
+Started GET "/calendars/download_ics?event_type=simple" for ::1 at 2024-12-18 23:12:25 -0800
+  [1m[36mActiveRecord::SchemaMigration Load (0.0ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC /*application='CalendarApp'*/[0m
+Processing by CalendarsController#download_ics as HTML
+  Parameters: {"event_type"=>"simple"}
+Completed 500 Internal Server Error in 53ms (ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.6ms)
+
+
+  
+TypeError (superclass mismatch for class Ics):
+  
+app/controllers/calendars_controller.rb:24:in `download_ics'
+Started GET "/" for ::1 at 2024-12-18 23:12:32 -0800
+Processing by CalendarsController#index as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering calendars/index.html.erb within layouts/application
+  Rendered calendars/index.html.erb within layouts/application (Duration: 5.9ms | GC: 0.3ms)
+  Rendered layout layouts/application.html.erb (Duration: 19.0ms | GC: 1.1ms)
+Completed 200 OK in 59ms (Views: 20.2ms | ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 1.1ms)
+
+
+Started GET "/calendars/download_ics?event_type=simple" for ::1 at 2024-12-18 23:12:35 -0800
+Processing by CalendarsController#download_ics as HTML
+  Parameters: {"event_type"=>"simple"}
+Completed 500 Internal Server Error in 42ms (ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.0ms)
+
+
+  
+TypeError (superclass mismatch for class Ics):
+  
+app/controllers/calendars_controller.rb:24:in `download_ics'
+Started GET "/" for ::1 at 2024-12-18 23:12:42 -0800
+Processing by CalendarsController#index as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering calendars/index.html.erb within layouts/application
+  Rendered calendars/index.html.erb within layouts/application (Duration: 1.0ms | GC: 0.0ms)
+  Rendered layout layouts/application.html.erb (Duration: 1.7ms | GC: 0.0ms)
+Completed 200 OK in 47ms (Views: 1.9ms | ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.3ms)
+
+
+Started GET "/calendars/download_ics?event_type=simple" for ::1 at 2024-12-18 23:27:29 -0800
+Processing by CalendarsController#download_ics as HTML
+  Parameters: {"event_type"=>"simple"}
+Completed 500 Internal Server Error in 48ms (ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.0ms)
+
+
+  
+TypeError (superclass mismatch for class Ics):
+  
+app/controllers/calendars_controller.rb:24:in `download_ics'
+Started GET "/calendars/download_ics?event_type=simple" for ::1 at 2024-12-19 07:40:48 -0800
+  [1m[36mActiveRecord::SchemaMigration Load (0.1ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC /*application='CalendarApp'*/[0m
+Processing by CalendarsController#download_ics as HTML
+  Parameters: {"event_type"=>"simple"}
+Completed 500 Internal Server Error in 57ms (ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.7ms)
+
+
+  
+TypeError (superclass mismatch for class Ics):
+  
+app/controllers/calendars_controller.rb:24:in `download_ics'
+Started GET "/calendars/download_ics?event_type=simple" for ::1 at 2024-12-19 07:40:50 -0800
+Processing by CalendarsController#download_ics as HTML
+  Parameters: {"event_type"=>"simple"}
+Completed 500 Internal Server Error in 34ms (ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.0ms)
+
+
+  
+TypeError (superclass mismatch for class Ics):
+  
+app/controllers/calendars_controller.rb:24:in `download_ics'
+Started GET "/calendars/download_ics?event_type=simple" for ::1 at 2024-12-19 07:51:56 -0800
+Processing by CalendarsController#download_ics as HTML
+  Parameters: {"event_type"=>"simple"}
+Completed 500 Internal Server Error in 26ms (ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.3ms)
+
+
+  
+NameError (undefined local variable or method `generate_calendar_content' for an instance of CalInvite::Providers::Ics):
+  
+app/controllers/calendars_controller.rb:24:in `download_ics'
+Started GET "/calendars/download_ics?event_type=simple" for ::1 at 2024-12-19 07:52:14 -0800
+  [1m[36mActiveRecord::SchemaMigration Load (0.1ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC /*application='CalendarApp'*/[0m
+Processing by CalendarsController#download_ics as HTML
+  Parameters: {"event_type"=>"simple"}
+  Rendering text template
+  Rendered text template (Duration: 0.1ms | GC: 0.0ms)
+Sent data meeting_at_apple_s_historical_hq_20241219.ics (3.3ms)
+Completed 200 OK in 56ms (Views: 1.9ms | ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.6ms)
+
+
+Started GET "/calendars/download_ics?event_type=simple" for ::1 at 2024-12-19 07:52:19 -0800
+Processing by CalendarsController#download_ics as HTML
+  Parameters: {"event_type"=>"simple"}
+  Rendering text template
+  Rendered text template (Duration: 0.1ms | GC: 0.0ms)
+Sent data meeting_at_apple_s_historical_hq_20241219.ics (0.5ms)
+Completed 200 OK in 47ms (Views: 0.4ms | ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.0ms)
+
+
+Started GET "/calendars/download_ics?event_type=simple" for ::1 at 2024-12-19 07:52:47 -0800
+Processing by CalendarsController#download_ics as HTML
+  Parameters: {"event_type"=>"simple"}
+  Rendering text template
+  Rendered text template (Duration: 0.1ms | GC: 0.0ms)
+Sent data meeting_at_apple_s_historical_hq_20241219.ics (0.4ms)
+Completed 200 OK in 31ms (Views: 0.3ms | ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.0ms)
+
+
+Started GET "/" for ::1 at 2024-12-19 07:53:02 -0800
+Processing by CalendarsController#index as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering calendars/index.html.erb within layouts/application
+  Rendered calendars/index.html.erb within layouts/application (Duration: 2.7ms | GC: 0.0ms)
+  Rendered layout layouts/application.html.erb (Duration: 14.3ms | GC: 0.0ms)
+Completed 200 OK in 52ms (Views: 14.9ms | ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.0ms)
+
+
+Started GET "/assets/stimulus.min-4b1e420e.js" for ::1 at 2024-12-19 07:53:02 -0800
+Started GET "/assets/stimulus-loading-1fc53fe7.js" for ::1 at 2024-12-19 07:53:02 -0800
+Started GET "/calendars/download_ics?event_type=simple" for ::1 at 2024-12-19 07:53:05 -0800
+Processing by CalendarsController#download_ics as HTML
+  Parameters: {"event_type"=>"simple"}
+  Rendering text template
+  Rendered text template (Duration: 0.1ms | GC: 0.0ms)
+Sent data meeting_at_apple_s_historical_hq_20241219.ics (0.2ms)
+Completed 200 OK in 31ms (Views: 0.2ms | ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.0ms)
+
+
+Started GET "/calendars/download_ics?event_type=simple" for ::1 at 2024-12-19 07:53:05 -0800
+Processing by CalendarsController#download_ics as HTML
+  Parameters: {"event_type"=>"simple"}
+  Rendering text template
+  Rendered text template (Duration: 0.1ms | GC: 0.0ms)
+Sent data meeting_at_apple_s_historical_hq_20241219.ics (0.2ms)
+Completed 200 OK in 36ms (Views: 0.2ms | ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.0ms)
+
+
+Started GET "/apple-touch-icon-precomposed.png" for ::1 at 2024-12-19 07:56:01 -0800
+Started GET "/favicon.ico" for ::1 at 2024-12-19 07:56:01 -0800
+Started GET "/apple-touch-icon.png" for ::1 at 2024-12-19 07:56:01 -0800
+  
+ActionController::RoutingError (No route matches [GET] "/apple-touch-icon-precomposed.png"):
+  
+  
+ActionController::RoutingError (No route matches [GET] "/favicon.ico"):
+  
+  
+ActionController::RoutingError (No route matches [GET] "/apple-touch-icon.png"):
+  
+Started GET "/" for ::1 at 2024-12-19 07:56:02 -0800
+Processing by CalendarsController#index as HTML
+  Rendering public/406-unsupported-browser.html
+  Rendered public/406-unsupported-browser.html (Duration: 0.2ms | GC: 0.0ms)
+Filter chain halted as #<Proc:0x00000001245d4380 /Users/spaquet/.frum/versions/3.3.3/lib/ruby/gems/3.3.0/gems/actionpack-8.0.1/lib/action_controller/metal/allow_browser.rb:58 (lambda)> rendered or redirected
+Completed 406 Not Acceptable in 38ms (Views: 1.3ms | ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.1ms)
+
+
+Started GET "/" for ::1 at 2024-12-19 09:35:39 -0800
+Processing by CalendarsController#index as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering calendars/index.html.erb within layouts/application
+  Rendered calendars/index.html.erb within layouts/application (Duration: 1.4ms | GC: 0.3ms)
+  Rendered layout layouts/application.html.erb (Duration: 5.0ms | GC: 0.5ms)
+Completed 200 OK in 34ms (Views: 5.8ms | ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.8ms)
+
+
+Started GET "/calendars/download_ics?event_type=simple&provider=ical" for ::1 at 2024-12-19 09:35:45 -0800
+Processing by CalendarsController#download_ics as HTML
+  Parameters: {"event_type"=>"simple", "provider"=>"ical"}
+  Rendering text template
+  Rendered text template (Duration: 0.1ms | GC: 0.0ms)
+Sent data meeting_at_apple_s_historical_hq_20241219.ics (0.4ms)
+Completed 200 OK in 47ms (Views: 0.3ms | ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.0ms)
+
+
+Started GET "/calendars/download_ics?event_type=simple&provider=ical" for ::1 at 2024-12-19 09:35:46 -0800
+Processing by CalendarsController#download_ics as HTML
+  Parameters: {"event_type"=>"simple", "provider"=>"ical"}
+  Rendering text template
+  Rendered text template (Duration: 0.1ms | GC: 0.0ms)
+Sent data meeting_at_apple_s_historical_hq_20241219.ics (0.4ms)
+Completed 200 OK in 51ms (Views: 0.3ms | ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.2ms)
+
+
+Started GET "/calendars/download_ics?event_type=simple&provider=ical" for ::1 at 2024-12-19 09:38:45 -0800
+Processing by CalendarsController#download_ics as HTML
+  Parameters: {"event_type"=>"simple", "provider"=>"ical"}
+  Rendering text template
+  Rendered text template (Duration: 0.1ms | GC: 0.0ms)
+Sent data meeting_at_apple_s_historical_hq_20241219.ics (0.5ms)
+Completed 200 OK in 47ms (Views: 0.4ms | ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.0ms)
+
+
+Started GET "/" for ::1 at 2024-12-19 09:53:33 -0800
+  [1m[36mActiveRecord::SchemaMigration Load (0.1ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC /*application='CalendarApp'*/[0m
+Processing by CalendarsController#index as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering calendars/index.html.erb within layouts/application
+  Rendered calendars/index.html.erb within layouts/application (Duration: 4.7ms | GC: 0.0ms)
+  Rendered layout layouts/application.html.erb (Duration: 4.8ms | GC: 0.0ms)
+Completed 500 Internal Server Error in 61ms (ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.6ms)
+
+
+  
+ActionView::Template::Error (undefined method `add_optional_params' for an instance of CalInvite::Providers::Outlook)
+Caused by: NoMethodError (undefined method `add_optional_params' for an instance of CalInvite::Providers::Outlook)
+
+Information for: ActionView::Template::Error (undefined method `add_optional_params' for an instance of CalInvite::Providers::Outlook):
+    18:                 class: "text-blue-600 hover:text-blue-800" %>
+    19:           <% else %>
+    20:             <%= link_to "Add to Calendar",
+    21:                 @simple_event.generate_calendar_url(provider),
+    22:                 class: "text-blue-600 hover:text-blue-800 break-all",
+    23:                 target: "_blank" %>
+    24:           <% end %>
+  
+app/views/calendars/index.html.erb:21
+app/views/calendars/index.html.erb:12:in `each'
+app/views/calendars/index.html.erb:12
+
+Information for cause: NoMethodError (undefined method `add_optional_params' for an instance of CalInvite::Providers::Outlook):
+  
+app/views/calendars/index.html.erb:21
+app/views/calendars/index.html.erb:12:in `each'
+app/views/calendars/index.html.erb:12
+Started GET "/" for ::1 at 2024-12-19 09:58:01 -0800
+Processing by CalendarsController#index as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering calendars/index.html.erb within layouts/application
+  Rendered calendars/index.html.erb within layouts/application (Duration: 0.6ms | GC: 0.0ms)
+  Rendered layout layouts/application.html.erb (Duration: 0.8ms | GC: 0.0ms)
+Completed 500 Internal Server Error in 47ms (ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.0ms)
+
+
+  
+ActionView::Template::Error (undefined method `add_optional_params' for an instance of CalInvite::Providers::Outlook)
+Caused by: NoMethodError (undefined method `add_optional_params' for an instance of CalInvite::Providers::Outlook)
+
+Information for: ActionView::Template::Error (undefined method `add_optional_params' for an instance of CalInvite::Providers::Outlook):
+    18:                 class: "text-blue-600 hover:text-blue-800" %>
+    19:           <% else %>
+    20:             <%= link_to "Add to Calendar",
+    21:                 @simple_event.generate_calendar_url(provider),
+    22:                 class: "text-blue-600 hover:text-blue-800 break-all",
+    23:                 target: "_blank" %>
+    24:           <% end %>
+  
+app/views/calendars/index.html.erb:21
+app/views/calendars/index.html.erb:12:in `each'
+app/views/calendars/index.html.erb:12
+
+Information for cause: NoMethodError (undefined method `add_optional_params' for an instance of CalInvite::Providers::Outlook):
+  
+app/views/calendars/index.html.erb:21
+app/views/calendars/index.html.erb:12:in `each'
+app/views/calendars/index.html.erb:12
+Started GET "/" for ::1 at 2024-12-19 10:05:09 -0800
+  [1m[36mActiveRecord::SchemaMigration Load (0.0ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC /*application='CalendarApp'*/[0m
+Processing by CalendarsController#index as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering calendars/index.html.erb within layouts/application
+  Rendered calendars/index.html.erb within layouts/application (Duration: 3.2ms | GC: 0.1ms)
+  Rendered layout layouts/application.html.erb (Duration: 15.4ms | GC: 0.1ms)
+Completed 200 OK in 69ms (Views: 16.7ms | ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.9ms)
+
+
+Started GET "/assets/tailwind-b129518e.css" for ::1 at 2024-12-19 10:05:09 -0800
+Started GET "/assets/inter-font-1d90a608.css" for ::1 at 2024-12-19 10:05:09 -0800
+Started GET "/assets/application-8b441ae0.css" for ::1 at 2024-12-19 10:05:09 -0800
+Started GET "/assets/application.tailwind-46ffc28d.css" for ::1 at 2024-12-19 10:05:09 -0800
+Started GET "/assets/application-bfcdf840.js" for ::1 at 2024-12-19 10:05:09 -0800
+Started GET "/assets/stimulus-loading-1fc53fe7.js" for ::1 at 2024-12-19 10:05:09 -0800
+Started GET "/assets/controllers/application-3affb389.js" for ::1 at 2024-12-19 10:05:09 -0800
+Started GET "/assets/controllers/index-ee64e1f1.js" for ::1 at 2024-12-19 10:05:09 -0800
+Started GET "/assets/Inter-roman.latin.var-cfeef184.woff2" for ::1 at 2024-12-19 10:05:09 -0800
+Started GET "/assets/stimulus.min-4b1e420e.js" for ::1 at 2024-12-19 10:05:09 -0800
+Started GET "/assets/turbo.min-fae85750.js" for ::1 at 2024-12-19 10:05:09 -0800
+Started GET "/assets/controllers/hello_controller-708796bd.js" for ::1 at 2024-12-19 10:05:09 -0800
+Started GET "/" for ::1 at 2024-12-19 10:51:17 -0800
+  [1m[36mActiveRecord::SchemaMigration Load (0.1ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC /*application='CalendarApp'*/[0m
+Processing by CalendarsController#index as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering calendars/index.html.erb within layouts/application
+  Rendered calendars/index.html.erb within layouts/application (Duration: 3.2ms | GC: 0.1ms)
+  Rendered layout layouts/application.html.erb (Duration: 15.2ms | GC: 0.1ms)
+Completed 200 OK in 70ms (Views: 16.6ms | ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.8ms)
+
+
+Started GET "/" for ::1 at 2024-12-19 11:56:35 -0800
+  [1m[36mActiveRecord::SchemaMigration Load (0.1ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC /*application='CalendarApp'*/[0m
+Processing by CalendarsController#index as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering calendars/index.html.erb within layouts/application
+  Rendered calendars/index.html.erb within layouts/application (Duration: 2.7ms | GC: 0.0ms)
+  Rendered layout layouts/application.html.erb (Duration: 21.6ms | GC: 6.7ms)
+Completed 200 OK in 79ms (Views: 23.2ms | ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 6.7ms)
+
+
+Started GET "/calendars/download_ics?event_type=simple&provider=ical" for ::1 at 2024-12-19 11:57:02 -0800
+Processing by CalendarsController#download_ics as HTML
+  Parameters: {"event_type"=>"simple", "provider"=>"ical"}
+  Rendering text template
+  Rendered text template (Duration: 0.1ms | GC: 0.0ms)
+Sent data meeting_at_apple_s_historical_hq_20241219.ics (1.4ms)
+Completed 200 OK in 56ms (Views: 1.1ms | ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.0ms)
+
+
+Started GET "/" for ::1 at 2024-12-19 12:33:25 -0800
+  [1m[36mActiveRecord::SchemaMigration Load (0.1ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC /*application='CalendarApp'*/[0m
+Processing by CalendarsController#index as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering calendars/index.html.erb within layouts/application
+  Rendered calendars/index.html.erb within layouts/application (Duration: 7.9ms | GC: 3.8ms)
+  Rendered layout layouts/application.html.erb (Duration: 20.7ms | GC: 4.5ms)
+Completed 200 OK in 90ms (Views: 23.7ms | ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 17.0ms)
+
+
+Started GET "/calendars/download_ics?event_type=all_day&provider=ics" for ::1 at 2024-12-19 12:33:35 -0800
+Processing by CalendarsController#download_ics as HTML
+  Parameters: {"event_type"=>"all_day", "provider"=>"ics"}
+  Rendering text template
+  Rendered text template (Duration: 0.0ms | GC: 0.0ms)
+Sent data company_all-day_event_20241219.ics (1.0ms)
+Completed 200 OK in 52ms (Views: 0.7ms | ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.0ms)
+
+
+Started GET "/calendars/download_ics?event_type=all_day&provider=ics" for ::1 at 2024-12-19 12:33:36 -0800
+Processing by CalendarsController#download_ics as HTML
+  Parameters: {"event_type"=>"all_day", "provider"=>"ics"}
+  Rendering text template
+  Rendered text template (Duration: 0.1ms | GC: 0.0ms)
+Sent data company_all-day_event_20241219.ics (0.3ms)
+Completed 200 OK in 47ms (Views: 0.2ms | ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.0ms)
+
+
+Started GET "/" for ::1 at 2024-12-20 10:05:08 -0800
+  [1m[36mActiveRecord::SchemaMigration Load (0.1ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC /*application='CalendarApp'*/[0m
+Processing by CalendarsController#index as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering calendars/index.html.erb within layouts/application
+  Rendered calendars/index.html.erb within layouts/application (Duration: 1.1ms | GC: 0.0ms)
+  Rendered layout layouts/application.html.erb (Duration: 1.2ms | GC: 0.0ms)
+Completed 500 Internal Server Error in 66ms (ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 5.8ms)
+
+
+  
+ActionView::Template::Error (undefined local variable or method `send_test_email_calendars_path' for an instance of #<Class:0x000000011ff32da0>)
+Caused by: NameError (undefined local variable or method `send_test_email_calendars_path' for an instance of #<Class:0x000000011ff32da0>)
+
+Information for: ActionView::Template::Error (undefined local variable or method `send_test_email_calendars_path' for an instance of #<Class:0x000000011ff32da0>):
+    4:   <!-- Send an Email -->
+    5:   <div class="mb-8">
+    6:     <%= button_to "Send Test Email Invitation", 
+    7:                 send_test_email_calendars_path, 
+    8:                 method: :post,
+    9:                 class: "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" %>
+   10:   </div>
+  
+app/views/calendars/index.html.erb:7
+
+Information for cause: NameError (undefined local variable or method `send_test_email_calendars_path' for an instance of #<Class:0x000000011ff32da0>):
+  
+app/views/calendars/index.html.erb:7
+Started GET "/apple-touch-icon-precomposed.png" for ::1 at 2024-12-20 10:05:08 -0800
+  
+ActionController::RoutingError (No route matches [GET] "/apple-touch-icon-precomposed.png"):
+  
+Started GET "/apple-touch-icon.png" for ::1 at 2024-12-20 10:05:08 -0800
+  
+ActionController::RoutingError (No route matches [GET] "/apple-touch-icon.png"):
+  
+Started GET "/" for ::1 at 2024-12-20 10:07:09 -0800
+  [1m[36mActiveRecord::SchemaMigration Load (0.0ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC /*application='CalendarApp'*/[0m
+Processing by CalendarsController#index as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering calendars/index.html.erb within layouts/application
+  Rendered calendars/index.html.erb within layouts/application (Duration: 4.3ms | GC: 0.5ms)
+  Rendered layout layouts/application.html.erb (Duration: 21.8ms | GC: 8.3ms)
+Completed 200 OK in 85ms (Views: 23.3ms | ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 14.8ms)
+
+
+Started GET "/assets/tailwind-efa6ca3d.css" for ::1 at 2024-12-20 10:07:09 -0800
+Started GET "/assets/application-bfcdf840.js" for ::1 at 2024-12-20 10:07:09 -0800
+Started GET "/assets/turbo.min-fae85750.js" for ::1 at 2024-12-20 10:07:09 -0800
+Started GET "/assets/stimulus-loading-1fc53fe7.js" for ::1 at 2024-12-20 10:07:09 -0800
+Started GET "/assets/controllers/application-3affb389.js" for ::1 at 2024-12-20 10:07:10 -0800
+Started GET "/calendars/download_ics?event_type=simple&provider=ics" for ::1 at 2024-12-20 10:07:12 -0800
+Processing by CalendarsController#download_ics as HTML
+  Parameters: {"event_type"=>"simple", "provider"=>"ics"}
+  Rendering text template
+  Rendered text template (Duration: 0.1ms | GC: 0.0ms)
+Sent data meeting_at_apple_s_historical_hq_20241220.ics (1.0ms)
+Completed 200 OK in 50ms (Views: 0.8ms | ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.6ms)
+
+
+Started GET "/calendars/download_ics?event_type=simple&provider=ics" for ::1 at 2024-12-20 10:07:14 -0800
+Processing by CalendarsController#download_ics as HTML
+  Parameters: {"event_type"=>"simple", "provider"=>"ics"}
+  Rendering text template
+  Rendered text template (Duration: 0.1ms | GC: 0.0ms)
+Sent data meeting_at_apple_s_historical_hq_20241220.ics (0.3ms)
+Completed 200 OK in 44ms (Views: 0.3ms | ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.0ms)
+
+
+Started POST "/calendars/send_test_email" for ::1 at 2024-12-20 10:07:25 -0800
+Processing by CalendarsController#send_test_email as TURBO_STREAM
+  Parameters: {"authenticity_token"=>"[FILTERED]"}
+  Rendering layout layouts/mailer.html.erb
+  Rendering calendar_invite_mailer/event_invitation.html.erb within layouts/mailer
+  Rendered calendar_invite_mailer/event_invitation.html.erb within layouts/mailer (Duration: 1.2ms | GC: 0.3ms)
+  Rendered layout layouts/mailer.html.erb (Duration: 1.4ms | GC: 0.3ms)
+CalendarInviteMailer#event_invitation: processed outbound mail in 22.7ms
+Delivered mail 6765b25de5a05_254e467851082@Space-16.local.mail (40.8ms)
+Date: Fri, 20 Dec 2024 10:07:25 -0800
+From: from@example.com
+To: attendee@example.com
+Message-ID: <6765b25de5a05_254e467851082@Space-16.local.mail>
+Subject: Strategic Planning Meeting at Apple Park
+Mime-Version: 1.0
+Content-Type: text/html;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+
+
+----==_mimepart_6765b25de5827_254e46785097a
+Content-Type: text/html;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+
+<!-- BEGIN app/views/layouts/mailer.html.erb --><!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <style>
+      /* Email styles need to be inline */
+    </style>
+  </head>
+
+  <body>
+    <!-- BEGIN app/views/calendar_invite_mailer/event_invitation.html.erb --><!DOCTYPE html>
+<html>
+  <head>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />
+  </head>
+  <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+    <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+      <h1 style="color: #1a1a1a;">Strategic Planning Meeting at Apple Park</h1>
+      <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 20px 0;">
+        <p><strong>Date:</strong> December 25, 2024</p>
+        <p><strong>Time:</strong> 09:00 AM - 12:00 PM PT</p>
+        <p><strong>Location:</strong> Apple Park, 1 Apple Park Way, Cupertino, CA 95014</p>
+      </div>
+      <div style="margin: 20px 0;">
+        <p>Join us for our quarterly strategic planning session at Apple Park.</p>
+
+<p>Agenda:
+<br />9:00 AM - 9:30 AM: Welcome &amp; Coffee
+<br />9:30 AM - 10:30 AM: Q4 Performance Review
+<br />10:30 AM - 10:45 AM: Break
+<br />10:45 AM - 11:30 AM: 2025 Strategy Discussion
+<br />11:30 AM - 12:00 PM: Action Items &amp; Next Steps</p>
+
+<p>Please bring your laptop and any relevant materials.</p>
+
+<p>Security Notice:
+<br />You will need to check in at the Apple Park Visitor Center.
+<br />Please bring government-issued photo ID.
+</p>
+      </div>
+        <div style="margin: 20px 0; padding: 15px; border-left: 4px solid #007AFF;">
+          <strong>Additional Notes:</strong><br>
+          Parking available at the Steve Jobs Theater parking structure.
+        </div>
+      <p style="margin-top: 30px; color: #666;">
+        A calendar invitation has been attached to this email. Please add it to your calendar to receive updates and reminders.
+      </p>
+    </div>
+  </body>
+</html><!-- END app/views/calendar_invite_mailer/event_invitation.html.erb -->
+  </body>
+</html>
+<!-- END app/views/layouts/mailer.html.erb -->
+----==_mimepart_6765b25de5827_254e46785097a
+Content-Type: text/calendar;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+ filename=event.ics
+
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//CalInvite//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+UID:1734718045-e98036a73bafdfbe@cal-invite
+DTSTAMP:20241220T180725Z
+DTSTART;TZID=America/Los_Angeles:20241225T170000
+DTEND;TZID=America/Los_Angeles:20241225T200000
+SUMMARY:Strategic Planning Meeting at Apple Park
+DESCRIPTION:Join us for our quarterly strategic planning session at Apple Park.\n\nAgenda:\n9:00 AM - 9:30 AM: Welcome & Coffee\n9:30 AM - 10:30 AM: Q4 Performance Review\n10:30 AM - 10:45 AM: Break\n10:45 AM - 11:30 AM: 2025 Strategy Discussion\n11:30 AM - 12:00 PM: Action Items & Next Steps\n\nPlease bring your laptop and any relevant materials.\n\nSecurity Notice:\nYou will need to check in at the Apple Park Visitor Center.\nPlease bring government-issued photo ID.\n\n\nNotes: Parking available at the Steve Jobs Theater parking structure.
+LOCATION:Apple Park\, 1 Apple Park Way\, Cupertino\, CA 95014
+URL:https://example.com/meeting-details
+ATTENDEE;RSVP=TRUE:mailto:attendee@example.com
+END:VEVENT
+END:VCALENDAR
+----==_mimepart_6765b25de5827_254e46785097a--
+
+Redirected to http://localhost:3000/calendars
+Completed 302 Found in 178ms (ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 27.6ms)
+
+
+Started GET "/calendars" for ::1 at 2024-12-20 10:07:25 -0800
+Processing by CalendarsController#index as TURBO_STREAM
+  Rendering layout layouts/application.html.erb
+  Rendering calendars/index.html.erb within layouts/application
+  Rendered calendars/index.html.erb within layouts/application (Duration: 1.8ms | GC: 0.5ms)
+  Rendered layout layouts/application.html.erb (Duration: 2.2ms | GC: 0.5ms)
+Completed 200 OK in 28ms (Views: 2.4ms | ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.5ms)
+
+
