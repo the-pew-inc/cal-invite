@@ -59,7 +59,7 @@ jobs:
 
     - name: Generate RDoc
       run: |
-        bundle exec rdoc --exclude Example/calendar_app --op doc --force-update
+        bundle exec rdoc lib/**/*.rb --exclude Example/calendar_app --op doc --force-update --verbose
 
     - name: Debug Deployment
       run: |
