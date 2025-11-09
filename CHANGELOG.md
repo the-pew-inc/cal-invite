@@ -2,7 +2,7 @@
 
 ## [Released]
 
-## [v0.1.6] - 2025-11-09
+## [v0.1.7] - 2025-11-09
 
 - Upgrading to support Rails 8.1
 - Support gems upgrades
