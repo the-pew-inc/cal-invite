@@ -18,6 +18,8 @@ require 'digest'
 # @attr_accessor [Array<Hash>] multi_day_sessions Sessions for multi-day events
 # @attr_accessor [Boolean] all_day Whether this is an all-day event
 # @attr_accessor [Hash] organizer The event organizer, e.g. { name: "Jane Doe", email: "jane@example.com" }
+# @attr_accessor [String] uid Stable RFC 5545 UID identifying this event across its lifecycle
+# @attr_accessor [Integer] sequence RFC 5545 SEQUENCE number; bump on every REQUEST/CANCEL update
 module CalInvite
   class Event
     attr_accessor :title,
@@ -32,7 +34,9 @@ module CalInvite
                   :notes,
                   :multi_day_sessions,
                   :all_day,
-                  :organizer
+                  :organizer,
+                  :uid,
+                  :sequence
 
     # Initializes a new Event instance with the given attributes.
     #
@@ -50,6 +54,12 @@ module CalInvite
     # @option attributes [Array<Hash>] :multi_day_sessions Multi-day session details
     # @option attributes [Boolean] :all_day (false) Whether it's an all-day event
     # @option attributes [Hash] :organizer The event organizer, e.g. { name: "Jane Doe", email: "jane@example.com" }
+    # @option attributes [String] :uid A stable identifier for this event. If omitted, a random one
+    #   is generated and memoized on this instance. To update or cancel a previously sent invite,
+    #   you MUST pass the same :uid used originally — mail/calendar clients match REQUEST/CANCEL
+    #   messages to an existing event by UID, not by content.
+    # @option attributes [Integer] :sequence (0) RFC 5545 SEQUENCE number. Increment it yourself
+    #   each time you re-send a REQUEST or a CANCEL for the same :uid.
     #
     # @raise [ArgumentError] If required attributes are missing
     def initialize(attributes = {})
@@ -57,6 +67,8 @@ module CalInvite
       @timezone = attributes.delete(:timezone) || 'UTC'
       @multi_day_sessions = attributes.delete(:multi_day_sessions) || []
       @all_day = attributes.delete(:all_day) || false
+      @uid = attributes.delete(:uid) || generate_uid
+      @sequence = attributes.delete(:sequence) || 0
 
       attributes.each do |key, value|
         send("#{key}=", value) if respond_to?("#{key}=")
@@ -69,11 +81,15 @@ module CalInvite
     # iCalendar content) for the specified provider.
     #
     # @param provider [Symbol] The calendar provider to generate the URL for
-    # @param method [Symbol] The iCalendar METHOD to use (:publish or :request).
+    # @param method [Symbol] The iCalendar METHOD to use (:publish, :request, or :cancel).
     #   Only honored by the ics-family providers (ics, ical, ics_content); ignored
-    #   by URL-based providers. Use :request, together with an {#organizer}, to
-    #   produce an invite that mail clients (Gmail, Outlook, Apple Mail) recognize
-    #   and render with Accept/Decline actions rather than as a plain attachment.
+    #   by URL-based providers.
+    #   - :request (with an {#organizer} set) produces an invite that mail clients
+    #     (Gmail, Outlook, Apple Mail) recognize and render with Accept/Decline
+    #     actions rather than as a plain attachment.
+    #   - :cancel produces a cancellation (STATUS:CANCELLED) for a previously sent
+    #     :request. Reuse the same {#uid} and bump {#sequence} so clients match it
+    #     to the original invite instead of creating a new event.
     # @return [String] The generated calendar URL or content
     # @raise [ArgumentError] If required event attributes are missing
     #
@@ -86,6 +102,11 @@ module CalInvite
     # @example Generate an RFC 5545 meeting request for emailing as an invite
     #   event.organizer = { name: "Jane Doe", email: "jane@example.com" }
     #   event.generate_calendar_url(:ics, method: :request)
+    #
+    # @example Cancel a previously sent invite
+    #   event.uid = "the-original-uid@cal-invite"  # must match the original REQUEST
+    #   event.sequence = 1                          # incremented from the original
+    #   event.generate_calendar_url(:ics, method: :cancel)
     def generate_calendar_url(provider, method: :publish)
       validate!
 
@@ -127,6 +148,14 @@ module CalInvite
     end
 
     private
+
+    # Generates a stable unique identifier for this event.
+    # Format: timestamp-randomhex@cal-invite
+    #
+    # @return [String] The generated UID
+    def generate_uid
+      "#{Time.now.to_i}-#{SecureRandom.hex(8)}@cal-invite"
+    end
 
     # Capitalizes each part of the provider name.
     #
@@ -182,6 +211,8 @@ module CalInvite
           multi_day_sessions,
           all_day,
           organizer,
+          uid,
+          sequence,
           provider,
           method
         ].map(&:to_s).join('|')

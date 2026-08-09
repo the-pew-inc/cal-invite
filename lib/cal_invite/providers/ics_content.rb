@@ -61,7 +61,7 @@ module CalInvite
       def generate_vevent(start_time, end_time)
         [
           "BEGIN:VEVENT",
-          "UID:#{generate_uid}",
+          "UID:#{event.uid}",
           "DTSTAMP:#{format_timestamp(Time.now.utc)}",
           "DTSTART:#{format_timestamp(start_time)}",
           "DTEND:#{format_timestamp(end_time)}",
@@ -71,8 +71,8 @@ module CalInvite
           url_line,
           organizer_line,
           attendee_lines,
-          "SEQUENCE:0",
-          "STATUS:CONFIRMED",
+          "SEQUENCE:#{event.sequence}",
+          status_line,
           "END:VEVENT"
         ].compact
       end
@@ -83,14 +83,6 @@ module CalInvite
       # @return [String] The formatted UTC timestamp (YYYYMMDDTHHmmSSZ)
       def format_timestamp(time)
         time.utc.strftime("%Y%m%dT%H%M%SZ")
-      end
-
-      # Generates a unique identifier for the calendar event.
-      # Format: timestamp-randomhex@cal-invite
-      #
-      # @return [String] The generated UID
-      def generate_uid
-        "#{Time.now.to_i}-#{SecureRandom.hex(8)}@cal-invite"
       end
 
       # Escapes special characters in text according to iCalendar spec.

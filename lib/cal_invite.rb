@@ -8,6 +8,7 @@ require 'uri'
 require 'cal_invite/version'
 require 'cal_invite/configuration'
 require 'cal_invite/caching'
+require 'cal_invite/ical_timezone'
 require 'cal_invite/event'
 require 'cal_invite/providers'
 

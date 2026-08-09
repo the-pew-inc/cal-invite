@@ -85,7 +85,7 @@ module CalInvite
         # Required fields
         lines.concat([
           "SUMMARY:#{escape_text(event.title)}",
-          "UID:#{generate_uid}",
+          "UID:#{event.uid}",
           "DTSTAMP:#{format_timestamp(Time.now.utc)}"
         ])
 
@@ -102,31 +102,21 @@ module CalInvite
           end
         end
 
-        lines << "SEQUENCE:0"
-        lines << "STATUS:CONFIRMED"
+        lines << "SEQUENCE:#{event.sequence}"
+        lines << status_line
         lines << "END:VEVENT"
         lines.join("\r\n")
       end
 
-      # Generates the timezone block (VTIMEZONE) for the calendar.
-      # Only included for non-all-day events.
+      # Generates the timezone block (VTIMEZONE) for the calendar, with real
+      # STANDARD/DAYLIGHT observances derived from the timezone's transition rules.
+      # Only included for non-all-day events with a recognized, non-UTC timezone.
       #
-      # @return [String, nil] The formatted timezone block, or nil for all-day events
+      # @return [String, nil] The formatted timezone block, or nil if not applicable
       def generate_timezone
         return nil if event.all_day # No timezone needed for all-day events
-        [
-          "BEGIN:VTIMEZONE",
-          "TZID:#{event.timezone}",
-          "END:VTIMEZONE"
-        ].join("\r\n")
-      end
 
-      # Generates a unique identifier for the calendar event.
-      # Format: timestamp-randomhex@cal-invite
-      #
-      # @return [String] The generated UID
-      def generate_uid
-        "#{Time.now.to_i}-#{SecureRandom.hex(8)}@cal-invite"
+        vtimezone_lines&.join("\r\n")
       end
 
       # Formats a time object as a date string in iCalendar format.
@@ -138,12 +128,13 @@ module CalInvite
       end
 
       # Formats a time object as a local time string in iCalendar format.
-      # Times are assumed to be in the correct timezone already.
+      # Converts from UTC to the event's timezone; times are expected to be in
+      # UTC already.
       #
       # @param time [Time] The time to format
       # @return [String] The formatted local time (YYYYMMDDTHHmmSS)
       def format_local_time(time)
-        time.strftime("%Y%m%dT%H%M%S")
+        local_wall_time(time).strftime("%Y%m%dT%H%M%S")
       end
 
       # Formats a time object as an UTC timestamp in iCalendar format.

@@ -2,10 +2,13 @@
 
 ## [v0.2.0] - 2026-08-09
 
-- Add `Event#organizer` and a `method:` option (`:publish`/`:request`) to `generate_calendar_url`, so ics/ical output can carry `METHOD:REQUEST` + `ORGANIZER`/`SEQUENCE`/`STATUS`, matching what mail clients (Gmail, Outlook, Apple Mail) need to render an attached `.ics` as an RSVP-capable meeting invite rather than a plain file
+- Add `Event#organizer` and a `method:` option (`:publish`/`:request`/`:cancel`) to `generate_calendar_url`, so ics/ical output can carry `METHOD:REQUEST`/`METHOD:CANCEL` + `ORGANIZER`/`SEQUENCE`/`STATUS`, matching what mail clients (Gmail, Outlook, Apple Mail) need to render an attached `.ics` as an RSVP-capable meeting invite (or a real cancellation) rather than a plain file
 - `ATTENDEE` lines now include `CUTYPE`/`ROLE`/`PARTSTAT`
 - `IcsDownload.headers`/`.wrap_for_download` accept `method:` to add the matching `method=REQUEST` Content-Type parameter
 - Fix a `superclass mismatch` crash when both the `:ics` provider and `IcsDownload`/`IcsContent` were loaded (dead duplicate `Ics`/`Ical` class definitions in `ics_content.rb`)
+- **Fix: stable `UID`.** `Event#uid` is now a real attribute (auto-generated and memoized per `Event` instance, or pass your own) instead of the ics/ical/ics_content providers each minting a fresh random UID on every `generate` call — required for mail/calendar clients to recognize a `:request` update or `:cancel` as referring to a previously sent invite rather than a new, unrelated event. See new `Event#sequence` (defaults to `0`) and CONFIGURATION.md's "Updating and cancelling invites".
+- **Fix: real `VTIMEZONE`.** `:ics`/`:ical` now emit a complete `VTIMEZONE` component (`STANDARD`/`DAYLIGHT` observances with correct offsets and `RRULE`s, derived from TZInfo's transition data) for any recognized IANA timezone, instead of an empty/absent block. `DTSTART;TZID=...`/`DTEND;TZID=...` are also now correctly converted from UTC to that zone's local wall-clock time — previously the UTC clock digits were emitted verbatim under a non-UTC `TZID`, mislabeling the time. `'UTC'` continues to use plain `Z`-suffixed timestamps with no `VTIMEZONE`, as before.
+- Add `tzinfo` as an explicit gem dependency (previously relied on it only transitively via `activesupport`).
 
 ## [Released]
 

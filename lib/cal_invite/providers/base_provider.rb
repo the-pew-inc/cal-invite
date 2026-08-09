@@ -95,4 +95,27 @@ class BaseProvider
     cn = name ? %(;CN="#{name}") : ""
     "ORGANIZER#{cn}:mailto:#{event.organizer[:email]}"
   end
+
+  # The STATUS property, driven by the iCalendar METHOD in use.
+  # @return [String] "STATUS:CANCELLED" for :cancel, "STATUS:CONFIRMED" otherwise
+  def status_line
+    method == :cancel ? "STATUS:CANCELLED" : "STATUS:CONFIRMED"
+  end
+
+  # Converts a time to local wall-clock time for the event's timezone, for use in
+  # a `DTSTART;TZID=...`/`DTEND;TZID=...` property. Falls back to the time as given
+  # (unconverted) when the timezone isn't a TZInfo-recognized identifier (e.g. 'UTC'
+  # or a raw offset string), matching each provider's prior behavior for those cases.
+  #
+  # @param time [Time] The time to convert (interpreted as UTC)
+  # @return [Time] The local wall-clock time
+  def local_wall_time(time)
+    CalInvite::IcalTimezone.local_time(event.timezone, time) || time
+  end
+
+  # Builds the VTIMEZONE component lines for the event's timezone, if applicable.
+  # @return [Array<String>, nil] iCalendar lines, or nil for UTC/unrecognized timezones
+  def vtimezone_lines
+    CalInvite::IcalTimezone.vtimezone_lines(event.timezone)
+  end
 end
