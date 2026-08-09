@@ -21,6 +21,7 @@ gem "jbuilder"
 
 # Cal Invite gem [https://github.com/the-pew-inc/cal-invite]
 gem "cal-invite"
+# For local development against unreleased gem changes:
 # gem "cal-invite", path: "../../"
 
 gem "letter_opener", group: :development

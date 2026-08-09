@@ -8,12 +8,16 @@
     <code class="px-1 py-0.5 rounded bg-slate-100 text-sm">.ics</code> files for Apple Calendar and generic clients.
   </p>
 
-  <div class="mt-6">
+  <div class="mt-6 flex gap-3">
     <%= button_to send_test_email_calendars_path,
         method: :post,
         class: "inline-flex items-center gap-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-4 py-2.5 shadow-sm transition-colors" do %>
       <%= icon(:mail, css_class: "size-4") %>
       Send Test Email Invitation
+    <% end %>
+    <%= link_to meetings_path,
+        class: "inline-flex items-center gap-2 rounded-lg border border-slate-300 hover:bg-slate-50 text-slate-700 text-sm font-medium px-4 py-2.5 transition-colors" do %>
+      Send / Reschedule / Cancel a Meeting (uid + sequence demo)
     <% end %>
   </div>
 </div>

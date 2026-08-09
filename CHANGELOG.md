@@ -12,6 +12,8 @@
 - `Event#attendees` entries can now be `{ email:, name:, partstat: }` hashes (plain email strings still work) — `ATTENDEE` lines gain `CN=` and a settable `PARTSTAT` (`:accepted`/`:declined`/`:tentative`/`:needs_action`/`:delegated`) instead of always `NEEDS-ACTION`.
 - Add `method: :reply`, for building an attendee's `METHOD:REPLY` back to an organizer (omits `RSVP=TRUE`, honors each attendee's `partstat:`).
 - Add `Event#geo` (`GEO:` property), `Event#reminders` (`VALARM` blocks), `Event#busy` (`TRANSP:`), `Event#visibility` (`CLASS:`), `Event#rrule` (raw `RRULE:` recurrence value), and `Event#calendar_name` (`X-WR-CALNAME` on the `VCALENDAR`) — all optional, all emitted by `:ics`/`:ical`/`IcsContent`.
+- CONFIGURATION.md: add "Tracking RSVPs", "Guest permissions", and "Attendee-proposed reschedules (COUNTER)" — the gem is outbound-only (renders `.ics`/URLs), so RSVP replies, Google/Outlook-style guest permissions, and attendee-proposed time changes all require the host app to build something on top; these sections lay out what and how (inbound-reply webhook, provider-API alternative, why `COUNTER` isn't implemented).
+- `Example/calendar_app`: add a working `Meeting`/`MeetingAttendee` persistence example (migration + models + `MeetingsController#create`/`#reschedule`/`#cancel` + `MeetingMailer`) demonstrating the `uid`/`sequence` lifecycle end-to-end, plus an illustrative `EventRepliesController` showing how to parse an inbound `METHOD:REPLY` email. The example app now points at the local gem (`path: "../.."`) instead of the last published release, so it always reflects the in-progress version.
 
 ## [Released]
 

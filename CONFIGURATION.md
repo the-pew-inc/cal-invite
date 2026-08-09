@@ -13,6 +13,9 @@ For caching-specific detail, see [CACHING.md](CACHING.md).
 - [Email meeting invites (RSVP-capable)](#email-meeting-invites-rsvp-capable)
 - [Updating and cancelling invites](#updating-and-cancelling-invites)
 - [Attendee RSVP status and METHOD:REPLY](#attendee-rsvp-status-and-methodreply)
+- [Tracking RSVPs: what the gem does and doesn't do](#tracking-rsvps-what-the-gem-does-and-doesnt-do)
+- [Guest permissions (invite others, see guest list)](#guest-permissions-invite-others-see-guest-list)
+- [Attendee-proposed reschedules (COUNTER)](#attendee-proposed-reschedules-counter)
 - [Timezones and VTIMEZONE](#timezones-and-vtimezone)
 - [Global configuration (`CalInvite.configure`)](#global-configuration-calinviteconfigure)
 
@@ -235,6 +238,100 @@ underlying meeting will not, unless you pass the original `uid` back in. In
 practice this means: persist `event.uid` (e.g. alongside the meeting record in
 your database) the first time you send a `:request`, and pass it back in on
 every subsequent `:request`/`:cancel` for that meeting.
+
+A working reference implementation of this whole pattern — a `Meeting` model
+persisting `uid`/`sequence`, and controller actions that send/reschedule/cancel
+— lives in [`Example/calendar_app`](Example/calendar_app): see
+`app/models/meeting.rb` and `app/controllers/meetings_controller.rb`. It
+depends on the attendee-hash/`uid`/`sequence` features documented here, so it
+needs whatever gem version ships those (0.2.0+) — the example app's `Gemfile`
+tracks the published gem, so point it at `path: "../.."` locally if you want
+to run this demo before that release is out.
+
+## Tracking RSVPs: what the gem does and doesn't do
+
+CalInvite is **outbound-only**: it renders `.ics` content and calendar URLs.
+It has no concept of a response arriving back. This matters because of how
+iTIP (the RSVP protocol RFC 5545 invites use) actually works:
+
+1. You send a `.ics` with `METHOD:REQUEST` to an attendee.
+2. Their mail client shows Accept/Decline/Maybe because it recognizes the
+   `METHOD:REQUEST` + `ATTENDEE` structure.
+3. When they click one, their mail client sends a **new email** back to the
+   `ORGANIZER` address, with a `.ics` attachment of its own using
+   `METHOD:REPLY` (see [Attendee RSVP status and METHOD:REPLY](#attendee-rsvp-status-and-methodreply)
+   for what that looks like).
+4. That reply lands in the **organizer's mailbox** — not in your Rails app,
+   not anywhere CalInvite can see it. Nothing about steps 3–4 involves your
+   application unless you build something to intercept it.
+
+So "who's coming" tracking is a feature you build on top, not something the
+gem can hand you. Two ways to build it:
+
+**A. Parse inbound `METHOD:REPLY` emails.** Point the `ORGANIZER` address at
+an inbox your app can read — either via a transactional-email provider's
+inbound-parse webhook (SendGrid Inbound Parse, Postmark Inbound, Mailgun
+Routes, AWS SES + SNS + Lambda) or by polling a real mailbox over IMAP. When
+a reply arrives, extract its `text/calendar; method=REPLY` part, read the
+`UID` (to find your stored event) and each `ATTENDEE`'s `PARTSTAT`, and update
+your own record. `Example/calendar_app/app/controllers/event_replies_controller.rb`
+is a worked (but simplified — regex-based, not a full iCalendar parser)
+example of this extraction.
+
+   **Caveat:** this only works reliably when the `ORGANIZER` address is a real
+   mailbox or calendar account. A significant chunk of real-world clients
+   (Gmail's own RSVP buttons among them) don't send a distinct, parseable
+   `METHOD:REPLY` email back to an arbitrary `From:`/`ORGANIZER` address the
+   way a desktop client talking to an Exchange server does — some only update
+   *their own* calendar and never notify the organizer by email at all. Don't
+   build a product around "we'll always get a REPLY email"; treat it as
+   best-effort.
+
+**B. Don't send raw email invites at all — create the event via the
+provider's API instead.** If reliable RSVP tracking matters to your product,
+Google Calendar API's `events.insert` (with `sendUpdates: "all"`) and
+Microsoft Graph's `/events` both give you structured attendee status
+(`attendees[].responseStatus`) plus real push-notification webhooks
+(Google Calendar push notifications / Graph change notifications) when it
+changes — no email parsing involved. CalInvite doesn't do this (it has no
+API client, only URL/`.ics` generation), so this path means calling those
+APIs yourself alongside, or instead of, CalInvite. Reach for this over (A)
+whenever you control which calendar system your organizers use.
+
+## Guest permissions (invite others, see guest list)
+
+Google Calendar's "guests can invite others" / "guests can see guest list" /
+"guests can modify event" toggles are **not part of RFC 5545** and have no
+representation in `.ics` content — they're properties of Google Calendar API
+events specifically (`guestsCanInviteOthers`, `guestsCanSeeOtherGuests`,
+`guestsCanModify`), enforced by Google's servers when the event lives in
+Google Calendar. Microsoft has its own, different equivalent behind Graph API
+permissions. Neither is something an emailed `.ics` file can express or
+enforce, so CalInvite — which only generates `.ics`/URLs — has no attribute
+for it and can't add one that would do anything.
+
+If controlling guest permissions matters to your product, that's a vote for
+approach **B** above (call the provider's API directly) rather than emailing
+`.ics` files. The nearest thing CalInvite *can* do at the protocol level is
+the `method: :publish` vs `:request` choice (see [Email meeting invites](#email-meeting-invites-rsvp-capable)):
+`:publish` renders as a read-only calendar entry with no RSVP UI at all,
+while `:request` invites interaction. There's no middle ground (e.g. "can
+RSVP but can't see other guests") available at the `.ics` level.
+
+## Attendee-proposed reschedules (COUNTER)
+
+RFC 5545 defines `METHOD:COUNTER` (an attendee proposes a different time) and
+`METHOD:DECLINECOUNTER` (the organizer rejects the proposal) for this. CalInvite
+doesn't implement either — and in practice, mainstream mail clients (Gmail,
+Outlook.com, Apple Mail) mostly don't expose a "propose new time" action on
+`.ics` invites the way Outlook desktop/Exchange does, so implementing
+`COUNTER` generation wouldn't reliably produce a UI attendees can actually use.
+
+The practical fallback: set a real `Reply-To`/`organizer` address and let
+attendees negotiate by replying to the invite email itself (plain-language,
+not iTIP) or through whatever booking/scheduling flow your app already has;
+then send an updated `:request` (see [Updating and cancelling invites](#updating-and-cancelling-invites))
+once a new time is agreed.
 
 ## Timezones and VTIMEZONE
 

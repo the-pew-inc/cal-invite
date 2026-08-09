@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />
+  </head>
+  <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+    <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+      <% if @meeting.status == "cancelled" %>
+        <h1 style="color: #b91c1c;">Cancelled: <%= @meeting.title %></h1>
+        <p>This meeting has been cancelled by <%= @meeting.organizer_name %>.</p>
+      <% else %>
+        <h1 style="color: #1a1a1a;"><%= @meeting.title %></h1>
+        <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 20px 0;">
+          <p><strong>When:</strong> <%= @meeting.start_time.in_time_zone(@meeting.timezone).strftime("%B %d, %Y %I:%M %p") %> – <%= @meeting.end_time.in_time_zone(@meeting.timezone).strftime("%I:%M %p") %> (<%= @meeting.timezone %>)</p>
+          <% if @meeting.location.present? %><p><strong>Location:</strong> <%= @meeting.location %></p><% end %>
+          <% if @meeting.video_url.present? %><p><strong>Video:</strong> <%= link_to @meeting.video_url, @meeting.video_url %></p><% end %>
+          <p><strong>Organizer:</strong> <%= @meeting.organizer_name %> (<%= @meeting.organizer_email %>)</p>
+        </div>
+        <p style="margin-top: 30px; color: #666;">
+          A calendar invitation is attached. Your calendar app should offer Accept/Decline actions —
+          your response is sent back to the organizer's mailbox, not to this app.
+        </p>
+      <% end %>
+    </div>
+  </body>
+</html>
