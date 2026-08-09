@@ -34,6 +34,10 @@
 
 /public/assets
 
+# Ignore precompiled Tailwind build output.
+/app/assets/builds/*
+!/app/assets/builds/.keep
+
 .byebug_history
 
 # Ignore node_modules (installed for Tailwind CSS plugins).
