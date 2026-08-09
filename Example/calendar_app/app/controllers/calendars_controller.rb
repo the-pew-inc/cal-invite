@@ -5,6 +5,8 @@ class CalendarsController < ApplicationController
     @simple_event = create_simple_event
     @all_day_event = create_all_day_event
     @complete_event = create_complete_event
+    @video_event = create_video_meeting_event
+    @rsvp_event = create_rsvp_event
     # Order providers to show online calendars first, then downloads
     @providers = (CalInvite::Providers::SUPPORTED_PROVIDERS - [:ics, :ical]).sort + [:ical, :ics]
   end
@@ -17,6 +19,10 @@ class CalendarsController < ApplicationController
               create_all_day_event
             when 'complete'
               create_complete_event
+            when 'video'
+              create_video_meeting_event
+            when 'rsvp'
+              create_rsvp_event
             else
               raise ActionController::RoutingError.new('Not Found')
             end
@@ -24,9 +30,11 @@ class CalendarsController < ApplicationController
     provider = params[:provider]&.to_sym || :ics
     raise ArgumentError, "Invalid provider" unless [:ics, :ical].include?(provider)
 
+    method = params[:method] == 'request' ? :request : :publish
+
     # Use the provider directly from the gem
     provider_class = CalInvite::Providers.const_get(provider.to_s.capitalize)
-    content = provider_class.new(event).generate
+    content = provider_class.new(event, method: method).generate
 
     # Generate filename based on event title and date
     filename = "#{event.title.downcase.gsub(/[^0-9A-Za-z.\-]/, '_')}_#{Time.now.strftime('%Y%m%d')}.ics"
@@ -34,7 +42,7 @@ class CalendarsController < ApplicationController
     send_data(
       content,
       filename: filename,
-      type: 'text/calendar; charset=UTF-8',
+      type: "text/calendar; charset=UTF-8#{method == :request ? '; method=REQUEST' : ''}",
       disposition: 'attachment'
     )
   end
@@ -89,6 +97,42 @@ class CalendarsController < ApplicationController
       attendees: ["demo@example.com", "test@example.com"],
       show_attendees: true,
       notes: "Please bring your laptop"
+    )
+  end
+
+  def create_video_meeting_event
+    start_time = 7.days.from_now.change(hour: 11)
+    end_time = 7.days.from_now.change(hour: 11, min: 30)
+    pacific_time = TZInfo::Timezone.get('America/Los_Angeles')
+
+    CalInvite::Event.new(
+      title: "Remote Standup (Video Call)",
+      start_time: pacific_time.local_to_utc(start_time),
+      end_time: pacific_time.local_to_utc(end_time),
+      description: "Daily standup over video. No physical location, just a meeting link.",
+      url: "https://meet.google.com/abc-defg-hij",
+      timezone: "America/Los_Angeles",
+      attendees: ["demo@example.com", "test@example.com"],
+      show_attendees: true
+    )
+  end
+
+  def create_rsvp_event
+    start_time = 12.days.from_now.change(hour: 13)
+    end_time = 12.days.from_now.change(hour: 14)
+    pacific_time = TZInfo::Timezone.get('America/Los_Angeles')
+
+    CalInvite::Event.new(
+      title: "Product Roadmap Review (RSVP)",
+      start_time: pacific_time.local_to_utc(start_time),
+      end_time: pacific_time.local_to_utc(end_time),
+      description: "An RFC 5545 meeting request. Mail clients render Accept/Decline actions for this invite.",
+      url: "https://zoom.us/j/1234567890",
+      timezone: "America/Los_Angeles",
+      organizer: { name: "Jane Doe", email: "jane@example.com" },
+      attendees: ["attendee@example.com"],
+      show_attendees: true,
+      notes: "This invite uses method: :request so recipients can RSVP directly from their inbox."
     )
   end
 
