@@ -11,6 +11,7 @@ For caching-specific detail, see [CACHING.md](CACHING.md).
 - [`generate_calendar_url`](#generate_calendar_url)
 - [ICS content and downloads](#ics-content-and-downloads)
 - [Email meeting invites (RSVP-capable)](#email-meeting-invites-rsvp-capable)
+- [Replicating a ticketing-platform confirmation email](#replicating-a-ticketing-platform-confirmation-email)
 - [Updating and cancelling invites](#updating-and-cancelling-invites)
 - [Attendee RSVP status and METHOD:REPLY](#attendee-rsvp-status-and-methodreply)
 - [Tracking RSVPs: what the gem does and doesn't do](#tracking-rsvps-what-the-gem-does-and-doesnt-do)
@@ -31,7 +32,7 @@ All attributes are set via `CalInvite::Event.new(attributes)` or `event.update_a
 | `description`          | `String`        | no                                     | `nil`   | Plain text; combined with `notes` in provider output. |
 | `location`             | `String`        | no                                     | `nil`   | Physical location only. Kept separate from `url` so each provider formats it correctly. |
 | `url`                  | `String`        | no                                     | `nil`   | Virtual meeting link (Zoom, Meet, Teams, etc). Kept separate from `location`. |
-| `attendees`            | `Array<String, Hash>` | no                               | `nil`   | Email strings, or `{ email:, name:, partstat: }` hashes for a display name (`CN=`) and/or a specific RSVP status. Only emitted if `show_attendees` is `true`. `partstat` is one of `:accepted`, `:declined`, `:tentative`, `:needs_action` (default), `:delegated`. |
+| `attendees`            | `Array<String, Hash>` | no                               | `nil`   | Email strings, or `{ email:, name:, partstat:, rsvp: }` hashes for a display name (`CN=`), a specific RSVP status, and/or an explicit `RSVP=` override. Only emitted if `show_attendees` is `true`. `partstat` is one of `:accepted`, `:declined`, `:tentative`, `:needs_action` (default), `:delegated`. `rsvp:` defaults to `true` for `:request`/`:cancel`/`:publish` and `false` for `:reply`/`:counter`/`:decline_counter`; set it explicitly to override (e.g. `rsvp: false` on an already-`:accepted` attendee in a registration-confirmation invite — see [Replicating a ticketing-platform confirmation email](#replicating-a-ticketing-platform-confirmation-email)). |
 | `show_attendees`       | `Boolean`       | no                                     | `false` | Gate for including `attendees` in generated output. |
 | `organizer`             | `Hash`          | no, but required for `method: :request` | `nil`   | `{ name: "Jane Doe", email: "jane@example.com" }`. `name` is optional. See [Email meeting invites](#email-meeting-invites-rsvp-capable). |
 | `timezone`             | `String`        | no                                     | `'UTC'` | Controls display/formatting only — does not affect how `start_time`/`end_time` are interpreted. Any IANA identifier (e.g. `'America/New_York'`) produces a correctly converted `DTSTART;TZID=...` plus a full `VTIMEZONE` block; see [Timezones and VTIMEZONE](#timezones-and-vtimezone). |
@@ -172,6 +173,91 @@ attachments["team-meeting.ics"] = {
 ```
 
 Omit `method:` (or pass `method: :publish`) for a plain downloadable calendar file with no RSVP semantics.
+
+## Replicating a ticketing-platform confirmation email
+
+Event platforms send a specific style of email when you register: an HTML
+body plus a `.ics` attachment that mail/calendar clients recognize as a real
+invite, where you (the registrant) are already shown as `ACCEPTED` rather
+than being asked to RSVP. That's fully reproducible with CalInvite; here's
+the exact shape and how to build it with ActionMailer.
+
+**The `.ics` part.** A registration confirmation isn't really requesting a
+response — the registrant already confirmed by registering — so the
+attendee's own `ATTENDEE` line is `PARTSTAT=ACCEPTED` with no `RSVP=TRUE`.
+Set that via `partstat:` and `rsvp: false`:
+
+```ruby
+event = CalInvite::Event.new(
+  title: "Product Strategy Roundtable",
+  start_time: Time.current.utc,
+  end_time: Time.current.utc + 90.minutes,
+  description: "Join us for an evening of discussion...",
+  location: "Industrious, 1950 University Ave # 500, Palo Alto, CA 94303, USA",
+  geo: [37.4593509, -122.1417815],
+  organizer: { name: "Your Company Events", email: "calendar-invite@yourdomain.com" },
+  attendees: [
+    { email: registrant.email, name: registrant.email, partstat: :accepted, rsvp: false }
+  ],
+  show_attendees: true,
+  uid: "reg-#{registration.id}@yourdomain.com"  # persist this — see "Updating and cancelling invites"
+)
+
+ics_content = event.generate_calendar_url(:ics, method: :request)
+```
+
+`rsvp: false` on an attendee hash suppresses `RSVP=TRUE` for that attendee
+regardless of `method:` — the one case it's needed is exactly this one, where
+`method: :request` is still correct (it's what puts `METHOD:REQUEST` +
+`ORGANIZER` in the file, which is what makes clients treat the whole thing as
+a calendar entry at all) but nothing is actually being requested from a
+recipient who already RSVP'd by registering.
+
+**The email.** Attach `ics_content` with the same MIME type/params used in
+the [Email meeting invites](#email-meeting-invites-rsvp-capable) section
+above — the attachment needs `Content-Type: text/calendar; method=REQUEST`
+(not `send_data`'s plain `text/calendar`) for clients to render it as an
+invite rather than a generic file:
+
+```ruby
+class RegistrationMailer < ApplicationMailer
+  def confirmation(registration)
+    @registration = registration
+    event = registration.to_cal_event  # build as above
+
+    attachments["invite.ics"] = {
+      mime_type: "text/calendar; method=REQUEST; name=invite.ics",
+      content: event.generate_calendar_url(:ics, method: :request)
+    }
+
+    mail(
+      to: registration.email,
+      from: "Your Company Events <events@yourdomain.com>",
+      reply_to: "your-team@yourdomain.com",  # a human, doesn't have to be the ORGANIZER address
+      subject: "Registration confirmed for #{event.title}"
+    )
+  end
+end
+```
+
+Note the three addresses can legitimately differ, on purpose: `From` is the
+branded sender identity, `Reply-To` is wherever a human should see replies,
+and the `.ics`'s `ORGANIZER` `mailto:` is whatever mailbox should receive
+iTIP `METHOD:REPLY` messages if you're doing [RSVP tracking](#tracking-rsvps-what-the-gem-does-and-doesnt-do)
+— it doesn't have to match either header. If you don't have a mailbox
+watching that address, that's fine too; the invite still works, you just
+won't get the reply-tracking benefit.
+
+**Apple Wallet passes (`.pkpass`) are unrelated and out of scope.** A
+`.pkpass` file is Apple's PassKit format (tickets, boarding passes, loyalty
+cards) — a signed archive requiring an Apple Developer "Pass Type ID"
+certificate and its own generation/signing toolchain entirely separate from
+iCalendar. It's not a calendar invite mechanism at all (the `.ics` in this
+kind of email does the calendar part; the `.pkpass` is a separate, optional
+attachment some platforms add for wallet/ticket display). CalInvite doesn't
+produce these and won't — if you need them, look at a PassKit-specific gem
+(e.g. `passbook`/`pkpass` on RubyGems) as a separate concern from anything
+here.
 
 ## Updating and cancelling invites
 

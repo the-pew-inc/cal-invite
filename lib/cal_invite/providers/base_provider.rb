@@ -97,7 +97,21 @@ class BaseProvider
   # @param attendee [String, Hash] An attendee as given in Event#attendees
   # @return [String] The attendee's email address
   def attendee_email(attendee)
-    attendee.is_a?(Hash) ? (attendee[:email] || attendee["email"]) : attendee.to_s
+    attendee.is_a?(Hash) ? attendee_hash_value(attendee, :email) : attendee.to_s
+  end
+
+  # Reads `key` from an attendee hash, trying both symbol and string keys.
+  # Unlike `attendee[:key] || attendee["key"]`, this doesn't misread an
+  # explicit `false` value (e.g. `rsvp: false`) as "not set".
+  #
+  # @param attendee [Hash] An attendee hash
+  # @param key [Symbol] The key to read
+  # @return [Object, nil]
+  def attendee_hash_value(attendee, key)
+    return nil unless attendee.is_a?(Hash)
+    return attendee[key] if attendee.key?(key)
+
+    attendee[key.to_s]
   end
 
   NO_RSVP_METHODS = %i[reply counter decline_counter].freeze
@@ -113,18 +127,24 @@ class BaseProvider
   # Formats a full ATTENDEE property line for iCalendar output.
   #
   # @param attendee [String, Hash] An email string, or a hash like
-  #   { email:, name:, partstat: } for a display name and/or specific RSVP status
+  #   { email:, name:, partstat:, rsvp: } for a display name, specific RSVP
+  #   status, and/or an explicit RSVP override. `rsvp:` is rarely needed —
+  #   e.g. a "registration confirmed" invite where the recipient is already
+  #   `partstat: :accepted` and nothing is actually being requested, so
+  #   `rsvp: false` suppresses `RSVP=TRUE` even under `method: :request`.
   # @return [String] The formatted ATTENDEE line
   def attendee_line(attendee)
     email = attendee_email(attendee)
-    name = attendee.is_a?(Hash) ? (attendee[:name] || attendee["name"]) : nil
-    partstat_key = attendee.is_a?(Hash) ? (attendee[:partstat] || attendee["partstat"]) : nil
+    name = attendee_hash_value(attendee, :name)
+    partstat_key = attendee_hash_value(attendee, :partstat)
+    rsvp_override = attendee_hash_value(attendee, :rsvp)
 
     cn = name ? %(;CN="#{name}") : ""
     partstat = PARTSTAT_VALUES[partstat_key&.to_sym] || "NEEDS-ACTION"
     # REPLY/COUNTER/DECLINECOUNTER all flow attendee -> organizer; RSVP=TRUE
     # ("please respond") only makes sense on an organizer -> attendee REQUEST.
-    rsvp = NO_RSVP_METHODS.include?(method) ? "" : ";RSVP=TRUE"
+    rsvp_default = !NO_RSVP_METHODS.include?(method)
+    rsvp = (rsvp_override.nil? ? rsvp_default : rsvp_override) ? ";RSVP=TRUE" : ""
 
     "ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=#{partstat}#{rsvp}#{cn}:mailto:#{email}"
   end
