@@ -10,7 +10,7 @@ A Ruby gem for generating calendar invitations across multiple calendar platform
 ## Compatibility
 
 - Ruby >= 3.0.0
-- Rails 6.0, 6.1, 7.0, 7.1, 8.0
+- Rails 6.0, 6.1, 7.0, 7.1, 8.0, 8.1
 
 ## Supported Calendar Platforms
 
