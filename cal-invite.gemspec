@@ -38,7 +38,7 @@ Gem::Specification.new do |spec|
   # Uncomment to register a new dependency of your gem
   # spec.add_dependency "example-gem", "~> 1.0"
   spec.add_dependency "activesupport", ">= 6.0"
-  spec.add_development_dependency 'rdoc', '~> 6.5'
+  spec.add_development_dependency 'rdoc', '~> 8.0'
 
   # Configure RDoc options
   spec.rdoc_options = [
