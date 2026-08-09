@@ -39,6 +39,8 @@ module CalInvite
           "METHOD:#{method.to_s.upcase}"
         ]
 
+        calendar_lines << "X-WR-CALNAME:#{escape_text(event.calendar_name)}" if event.calendar_name
+
         if event.multi_day_sessions.any?
           event.multi_day_sessions.each do |session|
             calendar_lines.concat(generate_vevent(session[:start_time], session[:end_time]))
@@ -69,10 +71,15 @@ module CalInvite
           description_line,
           location_line,
           url_line,
+          geo_line,
           organizer_line,
           attendee_lines,
+          rrule_line,
           "SEQUENCE:#{event.sequence}",
           status_line,
+          transp_line,
+          class_line,
+          valarm_lines,
           "END:VEVENT"
         ].compact
       end
@@ -126,10 +133,8 @@ module CalInvite
       #
       # @return [Array<String>, nil] Array of ATTENDEE lines, or nil if no attendees or not showing
       def attendee_lines
-        return nil unless event.show_attendees && event.attendees&.any?
-        event.attendees.map do |attendee|
-          "ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;RSVP=TRUE:mailto:#{attendee}"
-        end
+        return nil if attendees_list.empty?
+        attendees_list.map { |attendee| attendee_line(attendee) }
       end
     end
 

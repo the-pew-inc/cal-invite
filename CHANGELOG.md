@@ -9,6 +9,9 @@
 - **Fix: stable `UID`.** `Event#uid` is now a real attribute (auto-generated and memoized per `Event` instance, or pass your own) instead of the ics/ical/ics_content providers each minting a fresh random UID on every `generate` call — required for mail/calendar clients to recognize a `:request` update or `:cancel` as referring to a previously sent invite rather than a new, unrelated event. See new `Event#sequence` (defaults to `0`) and CONFIGURATION.md's "Updating and cancelling invites".
 - **Fix: real `VTIMEZONE`.** `:ics`/`:ical` now emit a complete `VTIMEZONE` component (`STANDARD`/`DAYLIGHT` observances with correct offsets and `RRULE`s, derived from TZInfo's transition data) for any recognized IANA timezone, instead of an empty/absent block. `DTSTART;TZID=...`/`DTEND;TZID=...` are also now correctly converted from UTC to that zone's local wall-clock time — previously the UTC clock digits were emitted verbatim under a non-UTC `TZID`, mislabeling the time. `'UTC'` continues to use plain `Z`-suffixed timestamps with no `VTIMEZONE`, as before.
 - Add `tzinfo` as an explicit gem dependency (previously relied on it only transitively via `activesupport`).
+- `Event#attendees` entries can now be `{ email:, name:, partstat: }` hashes (plain email strings still work) — `ATTENDEE` lines gain `CN=` and a settable `PARTSTAT` (`:accepted`/`:declined`/`:tentative`/`:needs_action`/`:delegated`) instead of always `NEEDS-ACTION`.
+- Add `method: :reply`, for building an attendee's `METHOD:REPLY` back to an organizer (omits `RSVP=TRUE`, honors each attendee's `partstat:`).
+- Add `Event#geo` (`GEO:` property), `Event#reminders` (`VALARM` blocks), `Event#busy` (`TRANSP:`), `Event#visibility` (`CLASS:`), `Event#rrule` (raw `RRULE:` recurrence value), and `Event#calendar_name` (`X-WR-CALNAME` on the `VCALENDAR`) — all optional, all emitted by `:ics`/`:ical`/`IcsContent`.
 
 ## [Released]
 

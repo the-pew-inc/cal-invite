@@ -49,6 +49,8 @@ module CalInvite
           "METHOD:#{method.to_s.upcase}"
         ]
 
+        calendar_lines << "X-WR-CALNAME:#{escape_text(event.calendar_name)}" if event.calendar_name
+
         unless event.all_day
           calendar_lines.concat(vtimezone_lines || [])
         end
@@ -106,7 +108,8 @@ module CalInvite
       end
 
       # Adds optional fields to the event component if they exist.
-      # Handles description, location, URL, and attendees.
+      # Handles description, location, URL, geo, organizer, attendees, recurrence,
+      # visibility/busy status, and reminders.
       #
       # @param vevent [Array<String>] The current event lines array
       # @return [void]
@@ -125,18 +128,20 @@ module CalInvite
           vevent << "URL:#{escape_text(url)}"
         end
 
+        vevent << geo_line if geo_line
+
         if organizer = organizer_line
           vevent << organizer
         end
 
-        if attendees_list.any?
-          attendees_list.each do |attendee|
-            vevent << "ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;RSVP=TRUE:mailto:#{attendee}"
-          end
-        end
+        attendees_list.each { |attendee| vevent << attendee_line(attendee) }
 
+        vevent << rrule_line if rrule_line
         vevent << "SEQUENCE:#{event.sequence}"
         vevent << status_line
+        vevent << transp_line
+        vevent << class_line
+        vevent.concat(valarm_lines)
       end
 
       # Formats a time object as an UTC timestamp in iCalendar format.

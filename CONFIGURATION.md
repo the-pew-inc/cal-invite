@@ -12,6 +12,7 @@ For caching-specific detail, see [CACHING.md](CACHING.md).
 - [ICS content and downloads](#ics-content-and-downloads)
 - [Email meeting invites (RSVP-capable)](#email-meeting-invites-rsvp-capable)
 - [Updating and cancelling invites](#updating-and-cancelling-invites)
+- [Attendee RSVP status and METHOD:REPLY](#attendee-rsvp-status-and-methodreply)
 - [Timezones and VTIMEZONE](#timezones-and-vtimezone)
 - [Global configuration (`CalInvite.configure`)](#global-configuration-calinviteconfigure)
 
@@ -27,7 +28,7 @@ All attributes are set via `CalInvite::Event.new(attributes)` or `event.update_a
 | `description`          | `String`        | no                                     | `nil`   | Plain text; combined with `notes` in provider output. |
 | `location`             | `String`        | no                                     | `nil`   | Physical location only. Kept separate from `url` so each provider formats it correctly. |
 | `url`                  | `String`        | no                                     | `nil`   | Virtual meeting link (Zoom, Meet, Teams, etc). Kept separate from `location`. |
-| `attendees`            | `Array<String>` | no                                     | `nil`   | Email addresses. Only emitted if `show_attendees` is `true`. |
+| `attendees`            | `Array<String, Hash>` | no                               | `nil`   | Email strings, or `{ email:, name:, partstat: }` hashes for a display name (`CN=`) and/or a specific RSVP status. Only emitted if `show_attendees` is `true`. `partstat` is one of `:accepted`, `:declined`, `:tentative`, `:needs_action` (default), `:delegated`. |
 | `show_attendees`       | `Boolean`       | no                                     | `false` | Gate for including `attendees` in generated output. |
 | `organizer`             | `Hash`          | no, but required for `method: :request` | `nil`   | `{ name: "Jane Doe", email: "jane@example.com" }`. `name` is optional. See [Email meeting invites](#email-meeting-invites-rsvp-capable). |
 | `timezone`             | `String`        | no                                     | `'UTC'` | Controls display/formatting only — does not affect how `start_time`/`end_time` are interpreted. Any IANA identifier (e.g. `'America/New_York'`) produces a correctly converted `DTSTART;TZID=...` plus a full `VTIMEZONE` block; see [Timezones and VTIMEZONE](#timezones-and-vtimezone). |
@@ -36,6 +37,12 @@ All attributes are set via `CalInvite::Event.new(attributes)` or `event.update_a
 | `multi_day_sessions`   | `Array<Hash>`   | no                                     | `[]`    | `[{ start_time:, end_time: }, ...]`. Used instead of `start_time`/`end_time` for multi-session events. |
 | `uid`                  | `String`        | no                                     | randomly generated, memoized per `Event` instance | Stable RFC 5545 identifier. **Must** be reused across calls when you send an update (`:request`) or cancellation (`:cancel`) for a previously sent invite — see [Updating and cancelling invites](#updating-and-cancelling-invites). |
 | `sequence`             | `Integer`       | no                                     | `0`     | RFC 5545 SEQUENCE. Increment it yourself each time you resend a `:request`/`:cancel` for the same `uid`. |
+| `geo`                  | `Array<Float>`, `Hash` | no                              | `nil`   | `[37.4595, -122.1418]` or `{ lat:, lng: }`. Emits `GEO:lat;lng` — lets Apple/Google Maps deep-link from the invite. |
+| `reminders`            | `Array<Integer>`| no                                     | `nil`   | Minutes-before-start values, e.g. `[30, 10]`. One `VALARM` (`ACTION:DISPLAY`) per entry. |
+| `busy`                 | `Boolean`       | no                                     | `true`  | `TRANSP:OPAQUE` (busy, default) vs `TRANSP:TRANSPARENT` (free) for free/busy lookups. |
+| `visibility`           | `Symbol, String`| no                                     | `:public` | `:public`, `:private`, or `:confidential` → `CLASS:...`. |
+| `rrule`                | `String`        | no                                     | `nil`   | Raw RFC 5545 recurrence rule value, e.g. `"FREQ=WEEKLY;COUNT=5"`. Emitted as `RRULE:...`; construct the value yourself per [RFC 5545 §3.3.10](https://www.rfc-editor.org/rfc/rfc5545#section-3.3.10) — CalInvite doesn't build recurrence rules for you. |
+| `calendar_name`        | `String`        | no                                     | `nil`   | Calendar-level display name. Emitted as `X-WR-CALNAME` on the `VCALENDAR` (not per-event) when set. |
 
 ```ruby
 event = CalInvite::Event.new(
@@ -46,10 +53,17 @@ event = CalInvite::Event.new(
   location: "Conference Room A",
   url: "https://zoom.us/j/123456789",
   timezone: "America/New_York",
-  attendees: ["person@example.com"],
+  attendees: [
+    { email: "person@example.com", name: "Alex Kim" },
+    "another@example.com"
+  ],
   show_attendees: true,
   organizer: { name: "Jane Doe", email: "jane@example.com" },
-  notes: "Bring your laptop"
+  notes: "Bring your laptop",
+  geo: [37.4595, -122.1418],
+  reminders: [30, 10],
+  visibility: :private,
+  rrule: "FREQ=WEEKLY;COUNT=8"
 )
 ```
 
@@ -79,7 +93,7 @@ event.generate_calendar_url(provider, method: :publish)
 | Param     | Type     | Default    | Notes |
 |-----------|----------|------------|-------|
 | `provider`| `Symbol` | required   | One of the provider symbols above. |
-| `method`  | `Symbol` | `:publish` | `:publish`, `:request`, or `:cancel`. Only honored by `:ics`/`:ical` — ignored by URL-based providers. `:request` requires `organizer` to be set on the event; see below. `:cancel` requires reusing the original `uid` — see [Updating and cancelling invites](#updating-and-cancelling-invites). |
+| `method`  | `Symbol` | `:publish` | `:publish`, `:request`, `:cancel`, or `:reply`. Only honored by `:ics`/`:ical` — ignored by URL-based providers. `:request` requires `organizer` to be set on the event; see below. `:cancel` requires reusing the original `uid` — see [Updating and cancelling invites](#updating-and-cancelling-invites). `:reply` omits `RSVP=TRUE` on `ATTENDEE` lines — see [Attendee RSVP status and METHOD:REPLY](#attendee-rsvp-status-and-methodreply). |
 
 Results are cached (when caching is configured) keyed on all event attributes, `provider`, and `method` together — changing any of them produces a distinct cache entry.
 
@@ -141,7 +155,7 @@ headers = CalInvite::Providers::IcsDownload.headers("team-meeting.ics", method: 
 #      "Content-Disposition" => "attachment; filename=team-meeting.ics" }
 ```
 
-With `method: :request`, the generated `.ics` also gets `SEQUENCE:0`, `STATUS:CONFIRMED`, and richer `ATTENDEE` lines (`CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;RSVP=TRUE`) — all part of what RFC 5545 expects for a `REQUEST`.
+With `method: :request`, the generated `.ics` also gets `SEQUENCE`, `STATUS:CONFIRMED`, and richer `ATTENDEE` lines (`CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=...;RSVP=TRUE`, `PARTSTAT` defaulting to `NEEDS-ACTION` unless you set `partstat:` per attendee — see [Attendee RSVP status and METHOD:REPLY](#attendee-rsvp-status-and-methodreply)) — all part of what RFC 5545 expects for a `REQUEST`.
 
 If you're sending through ActionMailer, attach `content` with a matching `content_type` rather than `send_data`'s plain `text/calendar` type:
 
@@ -188,6 +202,31 @@ updated_content = event.generate_calendar_url(:ics, method: :request)
 event.sequence = 2
 cancellation = event.generate_calendar_url(:ics, method: :cancel)
 ```
+
+## Attendee RSVP status and METHOD:REPLY
+
+Pass attendees as hashes with `partstat:` to control each `ATTENDEE`'s status
+(`PARTSTAT=`) directly — useful both for representing already-known RSVPs and
+for building an attendee's `METHOD:REPLY` back to the organizer:
+
+```ruby
+event = CalInvite::Event.new(
+  title: "Team Meeting",
+  start_time: Time.current.utc,
+  end_time: Time.current.utc + 1.hour,
+  organizer: { name: "Jane Doe", email: "jane@example.com" },
+  attendees: [{ email: "bob@example.com", name: "Bob Smith", partstat: :declined }],
+  show_attendees: true,
+  uid: "1786300000-abcdef0123456789@cal-invite"  # the original invite's UID
+)
+
+reply = event.generate_calendar_url(:ics, method: :reply)
+```
+
+`partstat:` accepts `:accepted`, `:declined`, `:tentative`, `:needs_action`
+(default), or `:delegated`. With `method: :reply`, `RSVP=TRUE` is omitted from
+the `ATTENDEE` line (a reply isn't itself requesting a further response); every
+other method sets it.
 
 If you don't pass `uid:` explicitly, `Event.new` generates one and memoizes it
 on that instance — repeated `generate_calendar_url` calls on the *same* `Event`

@@ -11,7 +11,9 @@ require 'digest'
 # @attr_accessor [String] description The description of the event
 # @attr_accessor [String] location The location of the event
 # @attr_accessor [String] url The URL associated with the event
-# @attr_accessor [Array<String>] attendees The list of attendee email addresses
+# @attr_accessor [Array<String, Hash>] attendees Attendees as email strings, or hashes like
+#   { email:, name:, partstat: } for a display name and/or a specific RSVP status
+#   (:accepted, :declined, :tentative, :needs_action, :delegated)
 # @attr_accessor [String] timezone The timezone for the event
 # @attr_accessor [Boolean] show_attendees Whether to include attendees in calendar invites
 # @attr_accessor [String] notes Additional notes for the event
@@ -20,6 +22,12 @@ require 'digest'
 # @attr_accessor [Hash] organizer The event organizer, e.g. { name: "Jane Doe", email: "jane@example.com" }
 # @attr_accessor [String] uid Stable RFC 5545 UID identifying this event across its lifecycle
 # @attr_accessor [Integer] sequence RFC 5545 SEQUENCE number; bump on every REQUEST/CANCEL update
+# @attr_accessor [Array<Float>, Hash] geo Location coordinates, e.g. [37.4595, -122.1418] or { lat:, lng: }
+# @attr_accessor [Array<Integer>] reminders Minutes-before-start values, one VALARM per entry
+# @attr_accessor [Boolean] busy Whether this event should show as busy (true) or free (false) on free/busy lookups
+# @attr_accessor [Symbol, String] visibility :public, :private, or :confidential
+# @attr_accessor [String] rrule A raw RFC 5545 recurrence rule value, e.g. "FREQ=WEEKLY;COUNT=5"
+# @attr_accessor [String] calendar_name Calendar-level display name (X-WR-CALNAME)
 module CalInvite
   class Event
     attr_accessor :title,
@@ -36,7 +44,13 @@ module CalInvite
                   :all_day,
                   :organizer,
                   :uid,
-                  :sequence
+                  :sequence,
+                  :geo,
+                  :reminders,
+                  :busy,
+                  :visibility,
+                  :rrule,
+                  :calendar_name
 
     # Initializes a new Event instance with the given attributes.
     #
@@ -60,6 +74,13 @@ module CalInvite
     #   messages to an existing event by UID, not by content.
     # @option attributes [Integer] :sequence (0) RFC 5545 SEQUENCE number. Increment it yourself
     #   each time you re-send a REQUEST or a CANCEL for the same :uid.
+    # @option attributes [Array<Float>, Hash] :geo Location coordinates, e.g. [37.4595, -122.1418]
+    #   or { lat:, lng: }
+    # @option attributes [Array<Integer>] :reminders Minutes-before-start values; one VALARM per entry
+    # @option attributes [Boolean] :busy (true) Whether this event shows as busy on free/busy lookups
+    # @option attributes [Symbol, String] :visibility (:public) :public, :private, or :confidential
+    # @option attributes [String] :rrule A raw RFC 5545 recurrence rule value, e.g. "FREQ=WEEKLY;COUNT=5"
+    # @option attributes [String] :calendar_name Calendar-level display name (X-WR-CALNAME)
     #
     # @raise [ArgumentError] If required attributes are missing
     def initialize(attributes = {})
@@ -69,6 +90,8 @@ module CalInvite
       @all_day = attributes.delete(:all_day) || false
       @uid = attributes.delete(:uid) || generate_uid
       @sequence = attributes.delete(:sequence) || 0
+      @busy = attributes.key?(:busy) ? attributes.delete(:busy) : true
+      @visibility = attributes.delete(:visibility) || :public
 
       attributes.each do |key, value|
         send("#{key}=", value) if respond_to?("#{key}=")
@@ -213,6 +236,12 @@ module CalInvite
           organizer,
           uid,
           sequence,
+          geo,
+          reminders,
+          busy,
+          visibility,
+          rrule,
+          calendar_name,
           provider,
           method
         ].map(&:to_s).join('|')

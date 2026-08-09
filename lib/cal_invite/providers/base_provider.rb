@@ -73,17 +73,58 @@ class BaseProvider
     params[:location] = url_encode(format_location) if format_location
 
     if event.show_attendees && event.attendees&.any?
-      params[:attendees] = event.attendees.join(',')
+      params[:attendees] = attendee_emails.join(',')
     end
 
     params
   end
 
   # Get the list of attendees if showing attendees is enabled
-  # @return [Array<String>] The list of attendees or empty array if disabled/none present
+  # @return [Array<String, Hash>] The list of attendees (email strings or
+  #   { email:, name:, partstat: } hashes) or empty array if disabled/none present
   def attendees_list
     return [] unless event.show_attendees && event.attendees&.any?
     event.attendees
+  end
+
+  # Plain email addresses for all attendees, regardless of whether they were
+  # given as strings or { email:, name:, partstat: } hashes.
+  # @return [Array<String>]
+  def attendee_emails
+    attendees_list.map { |attendee| attendee_email(attendee) }
+  end
+
+  # @param attendee [String, Hash] An attendee as given in Event#attendees
+  # @return [String] The attendee's email address
+  def attendee_email(attendee)
+    attendee.is_a?(Hash) ? (attendee[:email] || attendee["email"]) : attendee.to_s
+  end
+
+  PARTSTAT_VALUES = {
+    accepted: "ACCEPTED",
+    declined: "DECLINED",
+    tentative: "TENTATIVE",
+    needs_action: "NEEDS-ACTION",
+    delegated: "DELEGATED"
+  }.freeze
+
+  # Formats a full ATTENDEE property line for iCalendar output.
+  #
+  # @param attendee [String, Hash] An email string, or a hash like
+  #   { email:, name:, partstat: } for a display name and/or specific RSVP status
+  # @return [String] The formatted ATTENDEE line
+  def attendee_line(attendee)
+    email = attendee_email(attendee)
+    name = attendee.is_a?(Hash) ? (attendee[:name] || attendee["name"]) : nil
+    partstat_key = attendee.is_a?(Hash) ? (attendee[:partstat] || attendee["partstat"]) : nil
+
+    cn = name ? %(;CN="#{name}") : ""
+    partstat = PARTSTAT_VALUES[partstat_key&.to_sym] || "NEEDS-ACTION"
+    # A REPLY carries the responding attendee's own status back to the organizer;
+    # RSVP is meaningless there since no further response is being requested.
+    rsvp = method == :reply ? "" : ";RSVP=TRUE"
+
+    "ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=#{partstat}#{rsvp}#{cn}:mailto:#{email}"
   end
 
   # Format the ORGANIZER property for iCalendar output
@@ -117,5 +158,47 @@ class BaseProvider
   # @return [Array<String>, nil] iCalendar lines, or nil for UTC/unrecognized timezones
   def vtimezone_lines
     CalInvite::IcalTimezone.vtimezone_lines(event.timezone)
+  end
+
+  # Format the GEO property from Event#geo.
+  # @return [String, nil] The formatted GEO line, or nil if no geo is set
+  def geo_line
+    return nil unless event.geo
+
+    lat, lng = event.geo.is_a?(Hash) ? [event.geo[:lat] || event.geo["lat"], event.geo[:lng] || event.geo["lng"]] : event.geo
+    return nil unless lat && lng
+
+    "GEO:#{lat};#{lng}"
+  end
+
+  # The TRANSP property, from Event#busy (default true).
+  # @return [String] "TRANSP:OPAQUE" (busy) or "TRANSP:TRANSPARENT" (free)
+  def transp_line
+    event.busy == false ? "TRANSP:TRANSPARENT" : "TRANSP:OPAQUE"
+  end
+
+  # The CLASS property, from Event#visibility (default :public).
+  # @return [String] e.g. "CLASS:PUBLIC"
+  def class_line
+    "CLASS:#{(event.visibility || :public).to_s.upcase}"
+  end
+
+  # The RRULE property, from Event#rrule, if set.
+  # @return [String, nil] e.g. "RRULE:FREQ=WEEKLY;COUNT=5", or nil if no rrule is set
+  def rrule_line
+    return nil unless event.rrule
+
+    value = event.rrule.to_s
+    value.start_with?("RRULE:") ? value : "RRULE:#{value}"
+  end
+
+  # Builds VALARM sub-components from Event#reminders (minutes-before-start values).
+  # @return [Array<String>] iCalendar lines, one VALARM block per reminder, or [] if none
+  def valarm_lines
+    return [] unless event.reminders&.any?
+
+    event.reminders.flat_map do |minutes|
+      ["BEGIN:VALARM", "TRIGGER:-PT#{minutes.to_i}M", "ACTION:DISPLAY", "DESCRIPTION:Reminder", "END:VALARM"]
+    end
   end
 end
