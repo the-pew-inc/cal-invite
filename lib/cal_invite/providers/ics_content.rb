@@ -36,7 +36,7 @@ module CalInvite
           "VERSION:2.0",
           "PRODID:-//CalInvite//EN",
           "CALSCALE:GREGORIAN",
-          "METHOD:#{method.to_s.upcase}"
+          "METHOD:#{method_value}"
         ]
 
         calendar_lines << "X-WR-CALNAME:#{escape_text(event.calendar_name)}" if event.calendar_name
@@ -78,7 +78,10 @@ module CalInvite
           "SEQUENCE:#{event.sequence}",
           status_line,
           transp_line,
+          busystatus_line,
           class_line,
+          importance_lines,
+          disallow_counter_line,
           valarm_lines,
           "END:VEVENT"
         ].compact
@@ -153,7 +156,7 @@ module CalInvite
       # @return [Hash] HTTP headers for the ICS file download
       def self.headers(filename, method: nil)
         content_type = 'text/calendar; charset=UTF-8'
-        content_type += "; method=#{method.to_s.upcase}" if method
+        content_type += "; method=#{method == :decline_counter ? 'DECLINECOUNTER' : method.to_s.upcase}" if method
 
         {
           'Content-Type' => content_type,

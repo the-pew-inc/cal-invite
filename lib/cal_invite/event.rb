@@ -28,6 +28,11 @@ require 'digest'
 # @attr_accessor [Symbol, String] visibility :public, :private, or :confidential
 # @attr_accessor [String] rrule A raw RFC 5545 recurrence rule value, e.g. "FREQ=WEEKLY;COUNT=5"
 # @attr_accessor [String] calendar_name Calendar-level display name (X-WR-CALNAME)
+# @attr_accessor [Symbol, String] importance :low, :normal, or :high — maps to the standard
+#   PRIORITY property and, for Outlook specifically, X-MICROSOFT-CDO-IMPORTANCE
+# @attr_accessor [Boolean] allow_counter Whether attendees may propose a new time. When set to
+#   false, emits X-MICROSOFT-DISALLOW-COUNTER — the one client-specific lever available for
+#   this; other clients don't expose an equivalent control
 module CalInvite
   class Event
     attr_accessor :title,
@@ -50,7 +55,9 @@ module CalInvite
                   :busy,
                   :visibility,
                   :rrule,
-                  :calendar_name
+                  :calendar_name,
+                  :importance,
+                  :allow_counter
 
     # Initializes a new Event instance with the given attributes.
     #
@@ -81,6 +88,8 @@ module CalInvite
     # @option attributes [Symbol, String] :visibility (:public) :public, :private, or :confidential
     # @option attributes [String] :rrule A raw RFC 5545 recurrence rule value, e.g. "FREQ=WEEKLY;COUNT=5"
     # @option attributes [String] :calendar_name Calendar-level display name (X-WR-CALNAME)
+    # @option attributes [Symbol, String] :importance :low, :normal, or :high
+    # @option attributes [Boolean] :allow_counter (true) false emits X-MICROSOFT-DISALLOW-COUNTER
     #
     # @raise [ArgumentError] If required attributes are missing
     def initialize(attributes = {})
@@ -92,6 +101,7 @@ module CalInvite
       @sequence = attributes.delete(:sequence) || 0
       @busy = attributes.key?(:busy) ? attributes.delete(:busy) : true
       @visibility = attributes.delete(:visibility) || :public
+      @allow_counter = attributes.key?(:allow_counter) ? attributes.delete(:allow_counter) : true
 
       attributes.each do |key, value|
         send("#{key}=", value) if respond_to?("#{key}=")
@@ -104,15 +114,21 @@ module CalInvite
     # iCalendar content) for the specified provider.
     #
     # @param provider [Symbol] The calendar provider to generate the URL for
-    # @param method [Symbol] The iCalendar METHOD to use (:publish, :request, or :cancel).
-    #   Only honored by the ics-family providers (ics, ical, ics_content); ignored
-    #   by URL-based providers.
+    # @param method [Symbol] The iCalendar METHOD to use (:publish, :request, :cancel,
+    #   :reply, :counter, or :decline_counter). Only honored by the ics-family providers
+    #   (ics, ical, ics_content); ignored by URL-based providers.
     #   - :request (with an {#organizer} set) produces an invite that mail clients
     #     (Gmail, Outlook, Apple Mail) recognize and render with Accept/Decline
     #     actions rather than as a plain attachment.
     #   - :cancel produces a cancellation (STATUS:CANCELLED) for a previously sent
     #     :request. Reuse the same {#uid} and bump {#sequence} so clients match it
     #     to the original invite instead of creating a new event.
+    #   - :reply carries an attendee's own PARTSTAT back to the organizer.
+    #   - :counter carries an attendee's proposed new {#start_time}/{#end_time} back
+    #     to the organizer, keeping the original {#uid}/{#sequence}. Client support for
+    #     rendering this as an actionable UI is inconsistent — see CONFIGURATION.md's
+    #     "Attendee-proposed reschedules (COUNTER)".
+    #   - :decline_counter is the organizer rejecting a :counter proposal.
     # @return [String] The generated calendar URL or content
     # @raise [ArgumentError] If required event attributes are missing
     #
@@ -242,6 +258,8 @@ module CalInvite
           visibility,
           rrule,
           calendar_name,
+          importance,
+          allow_counter,
           provider,
           method
         ].map(&:to_s).join('|')

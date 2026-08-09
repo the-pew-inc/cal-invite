@@ -38,7 +38,7 @@ module CalInvite
           "VERSION:2.0",
           "PRODID:-//CalInvite//Ruby//EN",
           "CALSCALE:GREGORIAN",
-          "METHOD:#{method.to_s.upcase}",
+          "METHOD:#{method_value}",
           (event.calendar_name ? "X-WR-CALNAME:#{escape_text(event.calendar_name)}" : nil),
           generate_timezone,
           generate_events,
@@ -104,7 +104,10 @@ module CalInvite
         lines << "SEQUENCE:#{event.sequence}"
         lines << status_line
         lines << transp_line
+        lines << busystatus_line
         lines << class_line
+        lines.concat(importance_lines)
+        lines << disallow_counter_line if disallow_counter_line
         lines.concat(valarm_lines)
         lines << "END:VEVENT"
         lines.join("\r\n")

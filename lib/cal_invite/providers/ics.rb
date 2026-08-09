@@ -46,7 +46,7 @@ module CalInvite
           "VERSION:2.0",
           "PRODID:-//CalInvite//EN",
           "CALSCALE:GREGORIAN",
-          "METHOD:#{method.to_s.upcase}"
+          "METHOD:#{method_value}"
         ]
 
         calendar_lines << "X-WR-CALNAME:#{escape_text(event.calendar_name)}" if event.calendar_name
@@ -140,7 +140,10 @@ module CalInvite
         vevent << "SEQUENCE:#{event.sequence}"
         vevent << status_line
         vevent << transp_line
+        vevent << busystatus_line
         vevent << class_line
+        vevent.concat(importance_lines)
+        vevent << disallow_counter_line if disallow_counter_line
         vevent.concat(valarm_lines)
       end
 

@@ -100,6 +100,8 @@ class BaseProvider
     attendee.is_a?(Hash) ? (attendee[:email] || attendee["email"]) : attendee.to_s
   end
 
+  NO_RSVP_METHODS = %i[reply counter decline_counter].freeze
+
   PARTSTAT_VALUES = {
     accepted: "ACCEPTED",
     declined: "DECLINED",
@@ -120,9 +122,9 @@ class BaseProvider
 
     cn = name ? %(;CN="#{name}") : ""
     partstat = PARTSTAT_VALUES[partstat_key&.to_sym] || "NEEDS-ACTION"
-    # A REPLY carries the responding attendee's own status back to the organizer;
-    # RSVP is meaningless there since no further response is being requested.
-    rsvp = method == :reply ? "" : ";RSVP=TRUE"
+    # REPLY/COUNTER/DECLINECOUNTER all flow attendee -> organizer; RSVP=TRUE
+    # ("please respond") only makes sense on an organizer -> attendee REQUEST.
+    rsvp = NO_RSVP_METHODS.include?(method) ? "" : ";RSVP=TRUE"
 
     "ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=#{partstat}#{rsvp}#{cn}:mailto:#{email}"
   end
@@ -135,6 +137,14 @@ class BaseProvider
     name = event.organizer[:name]
     cn = name ? %(;CN="#{name}") : ""
     "ORGANIZER#{cn}:mailto:#{event.organizer[:email]}"
+  end
+
+  # The value for the calendar-level METHOD property. RFC 5545 spells this
+  # method "DECLINECOUNTER" (one word) despite `:decline_counter` reading more
+  # naturally as a Ruby symbol.
+  # @return [String] e.g. "REQUEST", "DECLINECOUNTER"
+  def method_value
+    method == :decline_counter ? "DECLINECOUNTER" : method.to_s.upcase
   end
 
   # The STATUS property, driven by the iCalendar METHOD in use.
@@ -200,5 +210,40 @@ class BaseProvider
     event.reminders.flat_map do |minutes|
       ["BEGIN:VALARM", "TRIGGER:-PT#{minutes.to_i}M", "ACTION:DISPLAY", "DESCRIPTION:Reminder", "END:VALARM"]
     end
+  end
+
+  IMPORTANCE_VALUES = { low: ["9", "0"], normal: ["5", "1"], high: ["1", "2"] }.freeze
+
+  # Standard RFC 5545 PRIORITY plus Outlook's non-standard
+  # X-MICROSOFT-CDO-IMPORTANCE, from Event#importance (:low/:normal/:high). Safe
+  # to always include: RFC 5545 requires unrecognized X- properties be ignored
+  # by compliant parsers, so this has no effect outside Outlook.
+  # @return [Array<String>] 0, 1, or 2 lines
+  def importance_lines
+    values = IMPORTANCE_VALUES[event.importance&.to_sym]
+    return [] unless values
+
+    priority, importance = values
+    ["PRIORITY:#{priority}", "X-MICROSOFT-CDO-IMPORTANCE:#{importance}"]
+  end
+
+  # Outlook's non-standard X-MICROSOFT-CDO-BUSYSTATUS, mirroring Event#busy.
+  # Included alongside the standard TRANSP property since some Outlook versions
+  # honor this one more reliably.
+  # @return [String] e.g. "X-MICROSOFT-CDO-BUSYSTATUS:BUSY"
+  def busystatus_line
+    "X-MICROSOFT-CDO-BUSYSTATUS:#{event.busy == false ? "FREE" : "BUSY"}"
+  end
+
+  # Outlook's non-standard X-MICROSOFT-DISALLOW-COUNTER, from Event#allow_counter
+  # (default true). Set Event#allow_counter = false to hide Outlook's "Propose
+  # New Time" action — the practical lever for "prevent attendee-initiated
+  # reschedules" on Outlook specifically; other clients don't expose an
+  # equivalent control and ignore this property.
+  # @return [String, nil] "X-MICROSOFT-DISALLOW-COUNTER:TRUE", or nil if counters are allowed
+  def disallow_counter_line
+    return nil if event.allow_counter != false
+
+    "X-MICROSOFT-DISALLOW-COUNTER:TRUE"
   end
 end

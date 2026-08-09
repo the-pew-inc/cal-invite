@@ -46,6 +46,8 @@ All attributes are set via `CalInvite::Event.new(attributes)` or `event.update_a
 | `visibility`           | `Symbol, String`| no                                     | `:public` | `:public`, `:private`, or `:confidential` → `CLASS:...`. |
 | `rrule`                | `String`        | no                                     | `nil`   | Raw RFC 5545 recurrence rule value, e.g. `"FREQ=WEEKLY;COUNT=5"`. Emitted as `RRULE:...`; construct the value yourself per [RFC 5545 §3.3.10](https://www.rfc-editor.org/rfc/rfc5545#section-3.3.10) — CalInvite doesn't build recurrence rules for you. |
 | `calendar_name`        | `String`        | no                                     | `nil`   | Calendar-level display name. Emitted as `X-WR-CALNAME` on the `VCALENDAR` (not per-event) when set. |
+| `importance`           | `Symbol, String`| no                                     | `nil`   | `:low`, `:normal`, or `:high`. Emits standard `PRIORITY:` plus Outlook's `X-MICROSOFT-CDO-IMPORTANCE:`. See [Guest permissions](#guest-permissions-invite-others-see-guest-list). |
+| `allow_counter`        | `Boolean`       | no                                     | `true`  | `false` emits `X-MICROSOFT-DISALLOW-COUNTER:TRUE`, hiding Outlook's "Propose New Time" action. See [Guest permissions](#guest-permissions-invite-others-see-guest-list). |
 
 ```ruby
 event = CalInvite::Event.new(
@@ -96,7 +98,7 @@ event.generate_calendar_url(provider, method: :publish)
 | Param     | Type     | Default    | Notes |
 |-----------|----------|------------|-------|
 | `provider`| `Symbol` | required   | One of the provider symbols above. |
-| `method`  | `Symbol` | `:publish` | `:publish`, `:request`, `:cancel`, or `:reply`. Only honored by `:ics`/`:ical` — ignored by URL-based providers. `:request` requires `organizer` to be set on the event; see below. `:cancel` requires reusing the original `uid` — see [Updating and cancelling invites](#updating-and-cancelling-invites). `:reply` omits `RSVP=TRUE` on `ATTENDEE` lines — see [Attendee RSVP status and METHOD:REPLY](#attendee-rsvp-status-and-methodreply). |
+| `method`  | `Symbol` | `:publish` | `:publish`, `:request`, `:cancel`, `:reply`, `:counter`, or `:decline_counter`. Only honored by `:ics`/`:ical` — ignored by URL-based providers. `:request` requires `organizer` to be set on the event; see below. `:cancel` requires reusing the original `uid` — see [Updating and cancelling invites](#updating-and-cancelling-invites). `:reply`/`:counter`/`:decline_counter` omit `RSVP=TRUE` on `ATTENDEE` lines — see [Attendee RSVP status and METHOD:REPLY](#attendee-rsvp-status-and-methodreply) and [Attendee-proposed reschedules (COUNTER)](#attendee-proposed-reschedules-counter). Note: `:decline_counter` renders as `METHOD:DECLINECOUNTER` (one word, per RFC 5545). |
 
 Results are cached (when caching is configured) keyed on all event attributes, `provider`, and `method` together — changing any of them produces a distinct cache entry.
 
@@ -227,9 +229,9 @@ reply = event.generate_calendar_url(:ics, method: :reply)
 ```
 
 `partstat:` accepts `:accepted`, `:declined`, `:tentative`, `:needs_action`
-(default), or `:delegated`. With `method: :reply`, `RSVP=TRUE` is omitted from
-the `ATTENDEE` line (a reply isn't itself requesting a further response); every
-other method sets it.
+(default), or `:delegated`. `RSVP=TRUE` is omitted from `ATTENDEE` lines for
+`method: :reply`/`:counter`/`:decline_counter` (none of these are themselves
+requesting a further response); every other method sets it.
 
 If you don't pass `uid:` explicitly, `Event.new` generates one and memoizes it
 on that instance — repeated `generate_calendar_url` calls on the *same* `Event`
@@ -301,37 +303,106 @@ whenever you control which calendar system your organizers use.
 ## Guest permissions (invite others, see guest list)
 
 Google Calendar's "guests can invite others" / "guests can see guest list" /
-"guests can modify event" toggles are **not part of RFC 5545** and have no
-representation in `.ics` content — they're properties of Google Calendar API
-events specifically (`guestsCanInviteOthers`, `guestsCanSeeOtherGuests`,
-`guestsCanModify`), enforced by Google's servers when the event lives in
-Google Calendar. Microsoft has its own, different equivalent behind Graph API
-permissions. Neither is something an emailed `.ics` file can express or
-enforce, so CalInvite — which only generates `.ics`/URLs — has no attribute
-for it and can't add one that would do anything.
+"guests can modify event" toggles are genuinely **API-only** — there is no
+`.ics` property, and no parameter on Google's own "add to calendar" render
+URL (`calendar.google.com/calendar/render`), that expresses them. They're
+properties of a Google Calendar API event specifically
+(`guestsCanInviteOthers`, `guestsCanSeeOtherGuests`, `guestsCanModify`),
+enforced by Google's servers once the event actually lives in someone's
+Google Calendar — not something an emailed file or a "click to add this to
+your calendar" link can carry. Microsoft has its own, different equivalent
+behind Graph API permissions, with the same constraint. If this matters to
+your product, that's a vote for calling the provider's API directly (see
+"Tracking RSVPs" approach **B** above) instead of, or alongside, CalInvite.
 
-If controlling guest permissions matters to your product, that's a vote for
-approach **B** above (call the provider's API directly) rather than emailing
-`.ics` files. The nearest thing CalInvite *can* do at the protocol level is
-the `method: :publish` vs `:request` choice (see [Email meeting invites](#email-meeting-invites-rsvp-capable)):
+CalInvite *does* support the one **real**, protocol-level, provider-specific
+control that exists for this family of "restrict what attendees can do"
+requests — see the next section.
+
+### What CalInvite adds for Outlook specifically
+
+Outlook recognizes several non-standard `X-MICROSOFT-*` properties that
+aren't part of RFC 5545. They're safe to always include — compliant parsers
+(Google, Apple, everything else) are required to ignore properties they
+don't recognize — so CalInvite emits them automatically from existing/new
+`Event` attributes, no separate "generate for Outlook" step needed:
+
+| `Event` attribute | Property emitted | Effect |
+|---|---|---|
+| `allow_counter` (default `true`) | `X-MICROSOFT-DISALLOW-COUNTER:TRUE` when `false` | Hides Outlook's "Propose New Time" button. **This is the real lever for "prevent attendee-initiated time changes"** — the closest equivalent to a Google guest-permission toggle that actually exists at the invite level. |
+| `importance` (`:low`/`:normal`/`:high`) | `PRIORITY:` (standard RFC 5545, 1/5/9) + `X-MICROSOFT-CDO-IMPORTANCE:` (0/1/2) | Outlook's importance flag; the standard `PRIORITY` half is honored to some degree by other clients too. |
+| `busy` (default `true`) | `X-MICROSOFT-CDO-BUSYSTATUS:BUSY`/`FREE`, alongside the standard `TRANSP:` | Some Outlook versions read this more reliably than `TRANSP` alone for free/busy display. |
+
+```ruby
+event = CalInvite::Event.new(
+  title: "Board Meeting",
+  start_time: Time.current.utc,
+  end_time: Time.current.utc + 1.hour,
+  organizer: { name: "Jane Doe", email: "jane@example.com" },
+  attendees: ["bob@example.com"],
+  show_attendees: true,
+  importance: :high,
+  allow_counter: false   # attendees can't propose a new time in Outlook
+)
+
+event.generate_calendar_url(:ics, method: :request)
+```
+
+None of this is a "generate a different file per client" mechanism — it's
+one `.ics`/`.ical` output with a few extra lines that only Outlook acts on.
+There's no equivalent lever for Google/Apple Mail beyond `:publish` vs
+`:request` (see [Email meeting invites](#email-meeting-invites-rsvp-capable)):
 `:publish` renders as a read-only calendar entry with no RSVP UI at all,
-while `:request` invites interaction. There's no middle ground (e.g. "can
-RSVP but can't see other guests") available at the `.ics` level.
+`:request` invites interaction, and there's no middle ground (e.g. "can RSVP
+but can't see other guests") at the `.ics` level for those clients.
 
 ## Attendee-proposed reschedules (COUNTER)
 
 RFC 5545 defines `METHOD:COUNTER` (an attendee proposes a different time) and
-`METHOD:DECLINECOUNTER` (the organizer rejects the proposal) for this. CalInvite
-doesn't implement either — and in practice, mainstream mail clients (Gmail,
-Outlook.com, Apple Mail) mostly don't expose a "propose new time" action on
-`.ics` invites the way Outlook desktop/Exchange does, so implementing
-`COUNTER` generation wouldn't reliably produce a UI attendees can actually use.
+`METHOD:DECLINECOUNTER` (the organizer rejects the proposal). CalInvite
+generates both:
 
-The practical fallback: set a real `Reply-To`/`organizer` address and let
-attendees negotiate by replying to the invite email itself (plain-language,
-not iTIP) or through whatever booking/scheduling flow your app already has;
-then send an updated `:request` (see [Updating and cancelling invites](#updating-and-cancelling-invites))
-once a new time is agreed.
+```ruby
+# Attendee proposes a new time for an existing invite (same uid, same sequence —
+# COUNTER doesn't advance sequence; the organizer decides whether to accept it)
+counter_event = CalInvite::Event.new(
+  title: "Board Meeting",
+  start_time: proposed_start_time_utc,
+  end_time: proposed_end_time_utc,
+  organizer: { name: "Jane Doe", email: "jane@example.com" },
+  attendees: [{ email: "bob@example.com", partstat: :tentative }],
+  show_attendees: true,
+  uid: original_event.uid,
+  sequence: original_event.sequence
+)
+counter_event.generate_calendar_url(:ics, method: :counter)
+
+# Organizer rejects the proposal
+decline_event = CalInvite::Event.new(
+  title: "Board Meeting",
+  start_time: original_event.start_time,
+  end_time: original_event.end_time,
+  organizer: { name: "Jane Doe", email: "jane@example.com" },
+  uid: original_event.uid,
+  sequence: original_event.sequence
+)
+decline_event.generate_calendar_url(:ics, method: :decline_counter)
+```
+
+**Caveat that doesn't go away just because generation exists:** mainstream
+mail clients (Gmail, Outlook.com web, Apple Mail) mostly don't expose a
+"propose new time" *action* on a received `.ics` invite the way
+Outlook desktop/Exchange does — so a `:counter` you send has nowhere reliable
+to come *from* in the first place (an attendee can't easily trigger one from
+their inbox), and where it does arrive, rendering is inconsistent. Use it when
+you know your organizer side is Outlook/Exchange-based, or when you're
+generating both sides of the exchange yourself (e.g. a scheduling tool
+proposing times through its own UI, using `:counter`/`:decline_counter` as the
+wire format). For the general case, the practical fallback remains: a real
+`Reply-To`/`organizer` address for plain-language negotiation, then an updated
+`:request` (see [Updating and cancelling invites](#updating-and-cancelling-invites))
+once a new time is agreed. Also see `allow_counter` above if you want to shut
+this off on Outlook entirely rather than support it.
 
 ## Timezones and VTIMEZONE
 
