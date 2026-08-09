@@ -46,8 +46,14 @@ module CalInvite
           "VERSION:2.0",
           "PRODID:-//CalInvite//EN",
           "CALSCALE:GREGORIAN",
-          "METHOD:PUBLISH"
+          "METHOD:#{method_value}"
         ]
+
+        calendar_lines << "X-WR-CALNAME:#{escape_text(event.calendar_name)}" if event.calendar_name
+
+        unless event.all_day
+          calendar_lines.concat(vtimezone_lines || [])
+        end
 
         if event.all_day
           calendar_lines.concat(generate_all_day_event)
@@ -71,7 +77,7 @@ module CalInvite
       def generate_all_day_event
         vevent = [
           "BEGIN:VEVENT",
-          "UID:#{generate_uid}",
+          "UID:#{event.uid}",
           "DTSTAMP:#{format_timestamp(Time.now.utc)}",
           "DTSTART;VALUE=DATE:#{format_date(event.start_time)}",
           "DTEND;VALUE=DATE:#{format_date(event.end_time)}",
@@ -90,7 +96,7 @@ module CalInvite
       def generate_vevent(start_time, end_time)
         vevent = [
           "BEGIN:VEVENT",
-          "UID:#{generate_uid}",
+          "UID:#{event.uid}",
           "DTSTAMP:#{format_timestamp(Time.now.utc)}",
           "DTSTART;TZID=#{event.timezone}:#{format_local_timestamp(start_time)}",
           "DTEND;TZID=#{event.timezone}:#{format_local_timestamp(end_time)}",
@@ -102,7 +108,8 @@ module CalInvite
       end
 
       # Adds optional fields to the event component if they exist.
-      # Handles description, location, URL, and attendees.
+      # Handles description, location, URL, geo, organizer, attendees, recurrence,
+      # visibility/busy status, and reminders.
       #
       # @param vevent [Array<String>] The current event lines array
       # @return [void]
@@ -121,11 +128,23 @@ module CalInvite
           vevent << "URL:#{escape_text(url)}"
         end
 
-        if attendees_list.any?
-          attendees_list.each do |attendee|
-            vevent << "ATTENDEE;RSVP=TRUE:mailto:#{attendee}"
-          end
+        vevent << geo_line if geo_line
+
+        if organizer = organizer_line
+          vevent << organizer
         end
+
+        attendees_list.each { |attendee| vevent << attendee_line(attendee) }
+
+        vevent << rrule_line if rrule_line
+        vevent << "SEQUENCE:#{event.sequence}"
+        vevent << status_line
+        vevent << transp_line
+        vevent << busystatus_line
+        vevent << class_line
+        vevent.concat(importance_lines)
+        vevent << disallow_counter_line if disallow_counter_line
+        vevent.concat(valarm_lines)
       end
 
       # Formats a time object as an UTC timestamp in iCalendar format.
@@ -145,20 +164,13 @@ module CalInvite
       end
 
       # Formats a time object as a local timestamp in iCalendar format.
-      # Note: Times are expected to be in UTC already.
+      # Converts from UTC to the event's timezone; times are expected to be in
+      # UTC already.
       #
       # @param time [Time] The time to format
       # @return [String] The formatted local time (YYYYMMDDTHHmmSS)
       def format_local_timestamp(time)
-        time.strftime("%Y%m%dT%H%M%S")
-      end
-
-      # Generates a unique identifier for the calendar event.
-      # Format: timestamp-randomhex@cal-invite
-      #
-      # @return [String] The generated UID
-      def generate_uid
-        "#{Time.now.to_i}-#{SecureRandom.hex(8)}@cal-invite"
+        local_wall_time(time).strftime("%Y%m%dT%H%M%S")
       end
 
       # Escapes special characters in text according to iCalendar spec.

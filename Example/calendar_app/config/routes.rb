@@ -23,4 +23,17 @@ Rails.application.routes.draw do
       post :send_test_email  # This creates the send_test_email_calendars_path helper
     end
   end
+
+  # Demonstrates persisting uid/sequence and the send -> reschedule -> cancel
+  # lifecycle for a real RSVP-capable invite. See CONFIGURATION.md.
+  resources :meetings, only: [:index, :new, :create] do
+    member do
+      patch :reschedule
+      post :cancel
+    end
+  end
+
+  # Illustrative inbound-reply webhook target. Not wired to a real inbound
+  # email provider — see EventRepliesController's comments.
+  post "event_replies", to: "event_replies#create"
 end

@@ -38,7 +38,8 @@ module CalInvite
           "VERSION:2.0",
           "PRODID:-//CalInvite//Ruby//EN",
           "CALSCALE:GREGORIAN",
-          "METHOD:PUBLISH",
+          "METHOD:#{method_value}",
+          (event.calendar_name ? "X-WR-CALNAME:#{escape_text(event.calendar_name)}" : nil),
           generate_timezone,
           generate_events,
           "END:VCALENDAR"
@@ -85,7 +86,7 @@ module CalInvite
         # Required fields
         lines.concat([
           "SUMMARY:#{escape_text(event.title)}",
-          "UID:#{generate_uid}",
+          "UID:#{event.uid}",
           "DTSTAMP:#{format_timestamp(Time.now.utc)}"
         ])
 
@@ -93,37 +94,34 @@ module CalInvite
         lines << "DESCRIPTION:#{escape_text(format_description)}" if format_description
         lines << "LOCATION:#{escape_text(format_location)}" if format_location
         lines << "URL:#{escape_text(format_url)}" if format_url
+        lines << geo_line if geo_line
+        lines << organizer_line if organizer_line
 
         # Attendees
-        if attendees = attendees_list
-          attendees.each do |attendee|
-            lines << "ATTENDEE;RSVP=TRUE:mailto:#{attendee}"
-          end
-        end
+        attendees_list.each { |attendee| lines << attendee_line(attendee) }
 
+        lines << rrule_line if rrule_line
+        lines << "SEQUENCE:#{event.sequence}"
+        lines << status_line
+        lines << transp_line
+        lines << busystatus_line
+        lines << class_line
+        lines.concat(importance_lines)
+        lines << disallow_counter_line if disallow_counter_line
+        lines.concat(valarm_lines)
         lines << "END:VEVENT"
         lines.join("\r\n")
       end
 
-      # Generates the timezone block (VTIMEZONE) for the calendar.
-      # Only included for non-all-day events.
+      # Generates the timezone block (VTIMEZONE) for the calendar, with real
+      # STANDARD/DAYLIGHT observances derived from the timezone's transition rules.
+      # Only included for non-all-day events with a recognized, non-UTC timezone.
       #
-      # @return [String, nil] The formatted timezone block, or nil for all-day events
+      # @return [String, nil] The formatted timezone block, or nil if not applicable
       def generate_timezone
         return nil if event.all_day # No timezone needed for all-day events
-        [
-          "BEGIN:VTIMEZONE",
-          "TZID:#{event.timezone}",
-          "END:VTIMEZONE"
-        ].join("\r\n")
-      end
 
-      # Generates a unique identifier for the calendar event.
-      # Format: timestamp-randomhex@cal-invite
-      #
-      # @return [String] The generated UID
-      def generate_uid
-        "#{Time.now.to_i}-#{SecureRandom.hex(8)}@cal-invite"
+        vtimezone_lines&.join("\r\n")
       end
 
       # Formats a time object as a date string in iCalendar format.
@@ -135,12 +133,13 @@ module CalInvite
       end
 
       # Formats a time object as a local time string in iCalendar format.
-      # Times are assumed to be in the correct timezone already.
+      # Converts from UTC to the event's timezone; times are expected to be in
+      # UTC already.
       #
       # @param time [Time] The time to format
       # @return [String] The formatted local time (YYYYMMDDTHHmmSS)
       def format_local_time(time)
-        time.strftime("%Y%m%dT%H%M%S")
+        local_wall_time(time).strftime("%Y%m%dT%H%M%S")
       end
 
       # Formats a time object as an UTC timestamp in iCalendar format.

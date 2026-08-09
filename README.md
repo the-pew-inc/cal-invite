@@ -10,7 +10,7 @@ A Ruby gem for generating calendar invitations across multiple calendar platform
 ## Compatibility
 
 - Ruby >= 3.0.0
-- Rails 6.0, 6.1, 7.0, 7.1, 8.0
+- Rails 6.0, 6.1, 7.0, 7.1, 8.0, 8.1
 
 ## Supported Calendar Platforms
 
@@ -56,6 +56,8 @@ Important notes:
 - Always provide times in UTC
 - Use the timezone parameter to specify the display timezone
 - Location and URL are handled separately for better calendar integration
+
+For the full list of `Event` attributes, providers, and configuration options, see [CONFIGURATION.md](CONFIGURATION.md).
 
 ```ruby
 # Create an event with physical location
@@ -150,6 +152,14 @@ end
 
 You can implement this in any controller and route that makes sense for your application's architecture.
 
+### Sending Email Meeting Invites (RSVP-capable)
+
+By default, a `.ics` attachment opens as a file in most mail clients. To get
+Gmail/Outlook/Apple Mail to render the message as an invite with Accept/Decline
+actions (like Luma or Google Calendar invites do), set an `organizer` on the
+event and pass `method: :request` when generating. Full walkthrough and all
+options in [CONFIGURATION.md](CONFIGURATION.md#email-meeting-invites-rsvp-capable).
+
 ### ICS File Generation
 
 The gem provides two ways to generate ICS files:
@@ -225,7 +235,7 @@ CalInvite.configure do |config|
 end
 ```
 
-For detailed information about configuring caching in Rails applications and available options, see our [Caching Guide](https://github.com/the-pew-inc/cal-invite/blob/master/CACHING.md)
+For detailed information about configuring caching in Rails applications and available options, see our [Caching Guide](https://github.com/the-pew-inc/cal-invite/blob/master/CACHING.md). For every other configuration option (`Event` attributes, providers, email invites), see [CONFIGURATION.md](CONFIGURATION.md).
 
 ## Development
 
@@ -245,7 +255,7 @@ Bug reports and pull requests are welcome on GitHub at https://github.com/the-pe
 
 ## Documentation
 
-The documentation is spread accross the README, CAHCING and the doc folder.
+The documentation is spread across the README, [CONFIGURATION.md](CONFIGURATION.md), [CACHING.md](CACHING.md), and the doc folder.
 
 The documentation can be generated using `bundle exec rake rdoc`
 

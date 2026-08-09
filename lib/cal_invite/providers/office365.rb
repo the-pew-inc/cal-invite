@@ -115,8 +115,8 @@ module CalInvite
         params[:body] = url_encode(description_parts.join("\n\n")) if description_parts.any?
         params[:location] = url_encode(format_location) if format_location
 
-        if attendees = attendees_list
-          params[:to] = url_encode(attendees.join(';'))
+        if attendees_list.any?
+          params[:to] = url_encode(attendee_emails.join(';'))
         end
 
         params

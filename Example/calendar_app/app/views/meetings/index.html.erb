@@ -1,0 +1,63 @@
+<%# app/views/meetings/index.html.erb %>
+
+<div class="py-10">
+  <div class="flex items-center justify-between">
+    <h1 class="text-3xl font-bold tracking-tight text-slate-900">Meetings</h1>
+    <%= link_to "New meeting", new_meeting_path,
+        class: "inline-flex items-center gap-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-4 py-2.5 shadow-sm transition-colors" %>
+  </div>
+  <p class="mt-2 text-slate-600 max-w-2xl">
+    Reschedule/Cancel resend the invite using the same persisted
+    <code class="px-1 py-0.5 rounded bg-slate-100 text-sm">uid</code> with an incremented
+    <code class="px-1 py-0.5 rounded bg-slate-100 text-sm">sequence</code> — see
+    <code class="px-1 py-0.5 rounded bg-slate-100 text-sm">Meeting#bump_sequence!</code>.
+  </p>
+
+  <div class="mt-6 space-y-4">
+    <% @meetings.each do |meeting| %>
+      <div class="rounded-lg border border-slate-200 p-4 <%= 'opacity-60' if meeting.status == 'cancelled' %>">
+        <div class="flex items-start justify-between">
+          <div>
+            <h2 class="font-semibold text-slate-900">
+              <%= meeting.title %>
+              <% if meeting.status == "cancelled" %>
+                <span class="ml-2 text-xs font-medium text-red-700 bg-red-100 rounded px-2 py-0.5">Cancelled</span>
+              <% end %>
+            </h2>
+            <p class="text-sm text-slate-600">
+              <%= meeting.start_time.strftime("%B %d, %Y %I:%M %p") %> – <%= meeting.end_time.strftime("%I:%M %p") %>
+              (<%= meeting.timezone %>) · sequence <%= meeting.sequence %>
+            </p>
+            <p class="text-xs text-slate-400 font-mono"><%= meeting.uid %></p>
+          </div>
+
+          <% unless meeting.status == "cancelled" %>
+            <div class="flex gap-2">
+              <%= button_to "Reschedule +1h", reschedule_meeting_path(meeting),
+                  method: :patch,
+                  params: { meeting: { start_time: meeting.start_time + 1.hour, end_time: meeting.end_time + 1.hour } },
+                  class: "text-sm rounded-md border border-slate-300 px-3 py-1.5 hover:bg-slate-50" %>
+              <%= button_to "Cancel", cancel_meeting_path(meeting),
+                  method: :post,
+                  class: "text-sm rounded-md border border-red-300 text-red-700 px-3 py-1.5 hover:bg-red-50" %>
+            </div>
+          <% end %>
+        </div>
+
+        <% if meeting.meeting_attendees.any? %>
+          <ul class="mt-3 flex flex-wrap gap-2">
+            <% meeting.meeting_attendees.each do |attendee| %>
+              <li class="text-xs rounded-full bg-slate-100 px-2.5 py-1">
+                <%= attendee.email %> — <%= attendee.partstat.tr("_", " ") %>
+              </li>
+            <% end %>
+          </ul>
+        <% end %>
+      </div>
+    <% end %>
+
+    <% if @meetings.empty? %>
+      <p class="text-slate-500">No meetings yet. <%= link_to "Send one", new_meeting_path, class: "underline" %>.</p>
+    <% end %>
+  </div>
+</div>

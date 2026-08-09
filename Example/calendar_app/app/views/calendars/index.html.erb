@@ -1,85 +1,54 @@
 <%# app/views/calendars/index.html.erb %>
-<div class="max-w-6xl mx-auto p-8">
-  <h1 class="text-3xl font-bold mb-8">Calendar Invite Examples</h1>
-  <!-- Send an Email -->
-  <div class="mb-8">
-    <%= button_to "Send Test Email Invitation", 
-                send_test_email_calendars_path, 
-                method: :post,
-                class: "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" %>
-  </div>
-  <!-- Simple Event -->
-  <div class="mb-12">
-    <h2 class="text-xl font-semibold mb-4">Simple Meeting (5 days from now)</h2>
-    <p class="text-gray-600 mb-4">
-      A basic event at Apple's historical headquarters with minimal attributes.
-      Start time: <%= @simple_event.start_time.in_time_zone(@simple_event.timezone).strftime("%B %d, %Y at %I:%M %p") %> PT
-    </p>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      <% @providers.each do |provider| %>
-        <div class="p-4 border rounded-lg hover:bg-gray-50">
-          <h3 class="font-medium mb-2"><%= provider.to_s.sub('ics', 'ICS File').sub('ical', 'Apple Calendar').titleize %></h3>
-          <% if [:ics, :ical].include?(provider) %>
-            <%= link_to "Download Calendar File",
-                download_ics_calendars_path(event_type: 'simple', provider: provider),
-                class: "text-blue-600 hover:text-blue-800" %>
-          <% else %>
-            <%= link_to "Add to Calendar",
-                @simple_event.generate_calendar_url(provider),
-                class: "text-blue-600 hover:text-blue-800 break-all",
-                target: "_blank" %>
-          <% end %>
-        </div>
-      <% end %>
-    </div>
-  </div>
-  <!-- All Day Event -->
-  <div class="mb-12">
-    <h2 class="text-xl font-semibold mb-4">All-Day Event (10 days from now)</h2>
-    <p class="text-gray-600 mb-4">
-      A full-day event on <%= @all_day_event.start_time.in_time_zone(@all_day_event.timezone).strftime("%B %d, %Y") %>
-    </p>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      <% @providers.each do |provider| %>
-        <div class="p-4 border rounded-lg hover:bg-gray-50">
-          <h3 class="font-medium mb-2"><%= provider.to_s.sub('ics', 'ICS File').sub('ical', 'Apple Calendar').titleize %></h3>
-          <% if [:ics, :ical].include?(provider) %>
-            <%= link_to "Download Calendar File",
-                download_ics_calendars_path(event_type: 'all_day', provider: provider),
-                class: "text-blue-600 hover:text-blue-800" %>
-          <% else %>
-            <%= link_to "Add to Calendar",
-                @all_day_event.generate_calendar_url(provider),
-                class: "text-blue-600 hover:text-blue-800 break-all",
-                target: "_blank" %>
-          <% end %>
-        </div>
-      <% end %>
-    </div>
-  </div>
-  <!-- Complete Event -->
-  <div class="mb-12">
-    <h2 class="text-xl font-semibold mb-4">Full Feature Event (15 days from now)</h2>
-    <p class="text-gray-600 mb-4">
-      A comprehensive event showcasing all available calendar invite features.
-      Start time: <%= @complete_event.start_time.in_time_zone(@complete_event.timezone).strftime("%B %d, %Y at %I:%M %p") %> PT
-    </p>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      <% @providers.each do |provider| %>
-        <div class="p-4 border rounded-lg hover:bg-gray-50">
-          <h3 class="font-medium mb-2"><%= provider.to_s.sub('ics', 'ICS File').sub('ical', 'Apple Calendar').titleize %></h3>
-          <% if [:ics, :ical].include?(provider) %>
-            <%= link_to "Download Calendar File",
-                download_ics_calendars_path(event_type: 'complete', provider: provider),
-                class: "text-blue-600 hover:text-blue-800" %>
-          <% else %>
-            <%= link_to "Add to Calendar",
-                @complete_event.generate_calendar_url(provider),
-                class: "text-blue-600 hover:text-blue-800 break-all",
-                target: "_blank" %>
-          <% end %>
-        </div>
-      <% end %>
-    </div>
+
+<div class="py-10">
+  <h1 class="text-3xl font-bold tracking-tight text-slate-900">Calendar Invite Examples</h1>
+  <p class="mt-2 text-slate-600 max-w-2xl">
+    Live demos of every <code class="px-1 py-0.5 rounded bg-slate-100 text-sm">cal_invite</code> provider:
+    add-to-calendar links for Google, Outlook, Office 365 and Yahoo, plus downloadable
+    <code class="px-1 py-0.5 rounded bg-slate-100 text-sm">.ics</code> files for Apple Calendar and generic clients.
+  </p>
+
+  <div class="mt-6 flex gap-3">
+    <%= button_to send_test_email_calendars_path,
+        method: :post,
+        class: "inline-flex items-center gap-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-4 py-2.5 shadow-sm transition-colors" do %>
+      <%= icon(:mail, css_class: "size-4") %>
+      Send Test Email Invitation
+    <% end %>
+    <%= link_to meetings_path,
+        class: "inline-flex items-center gap-2 rounded-lg border border-slate-300 hover:bg-slate-50 text-slate-700 text-sm font-medium px-4 py-2.5 transition-colors" do %>
+      Send / Reschedule / Cancel a Meeting (uid + sequence demo)
+    <% end %>
   </div>
 </div>
+
+<%= render "event_section",
+    event: @simple_event,
+    event_type: "simple",
+    title: "Simple Meeting",
+    description: "A basic event at Apple's historical headquarters with minimal attributes." %>
+
+<%= render "event_section",
+    event: @video_event,
+    event_type: "video",
+    title: "Video Meeting (no physical location)",
+    description: "Location is left blank; only a virtual meeting url is set. Providers link straight to the video call." %>
+
+<%= render "event_section",
+    event: @all_day_event,
+    event_type: "all_day",
+    title: "All-Day Event",
+    description: "A full-day event with no specific start/end time." %>
+
+<%= render "event_section",
+    event: @rsvp_event,
+    event_type: "rsvp",
+    method: :request,
+    title: "RSVP Meeting Request",
+    description: "Built with organizer: and generated with method: :request, so the downloaded .ics is a real RFC 5545 meeting request — mail clients show Accept / Decline actions instead of a plain attachment." %>
+
+<%= render "event_section",
+    event: @complete_event,
+    event_type: "complete",
+    title: "Full Feature Event",
+    description: "A comprehensive event showcasing location, url, attendees and notes together." %>
