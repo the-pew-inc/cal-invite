@@ -1,5 +1,12 @@
 # Cal Invite
 
+## [v0.2.0] - 2026-08-09
+
+- Add `Event#organizer` and a `method:` option (`:publish`/`:request`) to `generate_calendar_url`, so ics/ical output can carry `METHOD:REQUEST` + `ORGANIZER`/`SEQUENCE`/`STATUS`, matching what mail clients (Gmail, Outlook, Apple Mail) need to render an attached `.ics` as an RSVP-capable meeting invite rather than a plain file
+- `ATTENDEE` lines now include `CUTYPE`/`ROLE`/`PARTSTAT`
+- `IcsDownload.headers`/`.wrap_for_download` accept `method:` to add the matching `method=REQUEST` Content-Type parameter
+- Fix a `superclass mismatch` crash when both the `:ics` provider and `IcsDownload`/`IcsContent` were loaded (dead duplicate `Ics`/`Ical` class definitions in `ics_content.rb`)
+
 ## [Released]
 
 ## [v0.1.7] - 2025-11-09

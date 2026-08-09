@@ -46,7 +46,7 @@ module CalInvite
           "VERSION:2.0",
           "PRODID:-//CalInvite//EN",
           "CALSCALE:GREGORIAN",
-          "METHOD:PUBLISH"
+          "METHOD:#{method.to_s.upcase}"
         ]
 
         if event.all_day
@@ -121,11 +121,18 @@ module CalInvite
           vevent << "URL:#{escape_text(url)}"
         end
 
+        if organizer = organizer_line
+          vevent << organizer
+        end
+
         if attendees_list.any?
           attendees_list.each do |attendee|
-            vevent << "ATTENDEE;RSVP=TRUE:mailto:#{attendee}"
+            vevent << "ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;RSVP=TRUE:mailto:#{attendee}"
           end
         end
+
+        vevent << "SEQUENCE:0"
+        vevent << "STATUS:CONFIRMED"
       end
 
       # Formats a time object as an UTC timestamp in iCalendar format.

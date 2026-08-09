@@ -17,6 +17,7 @@ require 'digest'
 # @attr_accessor [String] notes Additional notes for the event
 # @attr_accessor [Array<Hash>] multi_day_sessions Sessions for multi-day events
 # @attr_accessor [Boolean] all_day Whether this is an all-day event
+# @attr_accessor [Hash] organizer The event organizer, e.g. { name: "Jane Doe", email: "jane@example.com" }
 module CalInvite
   class Event
     attr_accessor :title,
@@ -30,7 +31,8 @@ module CalInvite
                   :show_attendees,
                   :notes,
                   :multi_day_sessions,
-                  :all_day
+                  :all_day,
+                  :organizer
 
     # Initializes a new Event instance with the given attributes.
     #
@@ -47,6 +49,7 @@ module CalInvite
     # @option attributes [String] :notes Additional notes
     # @option attributes [Array<Hash>] :multi_day_sessions Multi-day session details
     # @option attributes [Boolean] :all_day (false) Whether it's an all-day event
+    # @option attributes [Hash] :organizer The event organizer, e.g. { name: "Jane Doe", email: "jane@example.com" }
     #
     # @raise [ArgumentError] If required attributes are missing
     def initialize(attributes = {})
@@ -62,10 +65,16 @@ module CalInvite
       validate!
     end
 
-    # Generates a calendar URL for the specified provider.
+    # Generates a calendar URL (or, for the ics/ical/ics_content providers, raw
+    # iCalendar content) for the specified provider.
     #
     # @param provider [Symbol] The calendar provider to generate the URL for
-    # @return [String] The generated calendar URL
+    # @param method [Symbol] The iCalendar METHOD to use (:publish or :request).
+    #   Only honored by the ics-family providers (ics, ical, ics_content); ignored
+    #   by URL-based providers. Use :request, together with an {#organizer}, to
+    #   produce an invite that mail clients (Gmail, Outlook, Apple Mail) recognize
+    #   and render with Accept/Decline actions rather than as a plain attachment.
+    # @return [String] The generated calendar URL or content
     # @raise [ArgumentError] If required event attributes are missing
     #
     # @example Generate a Google Calendar URL
@@ -73,18 +82,22 @@ module CalInvite
     #
     # @example Generate an Outlook Calendar URL
     #   event.generate_calendar_url(:outlook)
-    def generate_calendar_url(provider)
+    #
+    # @example Generate an RFC 5545 meeting request for emailing as an invite
+    #   event.organizer = { name: "Jane Doe", email: "jane@example.com" }
+    #   event.generate_calendar_url(:ics, method: :request)
+    def generate_calendar_url(provider, method: :publish)
       validate!
 
       if caching_enabled?
-        cache_key = cache_key_for(provider)
+        cache_key = cache_key_for(provider, method)
         cached_url = fetch_from_cache(cache_key)
         return cached_url if cached_url
       end
 
       # Generate the URL
       provider_class = CalInvite::Providers.const_get(capitalize_provider(provider.to_s))
-      generator = provider_class.new(self)
+      generator = provider_class.new(self, method: method)
       url = generator.generate
 
       # Cache the result if caching is enabled
@@ -149,8 +162,9 @@ module CalInvite
     # Generates a cache key for the event and provider combination.
     #
     # @param provider [Symbol] The calendar provider
+    # @param method [Symbol] The iCalendar METHOD used to generate the content
     # @return [String, nil] The cache key or nil if caching is disabled
-    def cache_key_for(provider)
+    def cache_key_for(provider, method = :publish)
       return nil unless caching_enabled?
 
       attributes_hash = Digest::MD5.hexdigest(
@@ -167,7 +181,9 @@ module CalInvite
           notes,
           multi_day_sessions,
           all_day,
-          provider
+          organizer,
+          provider,
+          method
         ].map(&:to_s).join('|')
       )
 

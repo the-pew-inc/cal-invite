@@ -38,7 +38,7 @@ module CalInvite
           "VERSION:2.0",
           "PRODID:-//CalInvite//Ruby//EN",
           "CALSCALE:GREGORIAN",
-          "METHOD:PUBLISH",
+          "METHOD:#{method.to_s.upcase}",
           generate_timezone,
           generate_events,
           "END:VCALENDAR"
@@ -93,14 +93,17 @@ module CalInvite
         lines << "DESCRIPTION:#{escape_text(format_description)}" if format_description
         lines << "LOCATION:#{escape_text(format_location)}" if format_location
         lines << "URL:#{escape_text(format_url)}" if format_url
+        lines << organizer_line if organizer_line
 
         # Attendees
         if attendees = attendees_list
           attendees.each do |attendee|
-            lines << "ATTENDEE;RSVP=TRUE:mailto:#{attendee}"
+            lines << "ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;RSVP=TRUE:mailto:#{attendee}"
           end
         end
 
+        lines << "SEQUENCE:0"
+        lines << "STATUS:CONFIRMED"
         lines << "END:VEVENT"
         lines.join("\r\n")
       end

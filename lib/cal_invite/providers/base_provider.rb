@@ -6,13 +6,16 @@
 #
 # @abstract Subclass and override {#generate} to implement a calendar provider
 class BaseProvider
-  attr_reader :event
+  attr_reader :event, :method
 
   # Initialize a new calendar provider
   #
   # @param event [CalInvite::Event] The event to generate a calendar URL for
-  def initialize(event)
+  # @param method [Symbol] The iCalendar METHOD (:publish or :request). Only
+  #   meaningful to the ics-family providers; URL-based providers ignore it.
+  def initialize(event, method: :publish)
     @event = event
+    @method = method
   end
 
   # Generate a calendar URL or content for the event.
@@ -81,5 +84,15 @@ class BaseProvider
   def attendees_list
     return [] unless event.show_attendees && event.attendees&.any?
     event.attendees
+  end
+
+  # Format the ORGANIZER property for iCalendar output
+  # @return [String, nil] The formatted ORGANIZER line, or nil if no organizer is set
+  def organizer_line
+    return nil unless event.organizer && event.organizer[:email]
+
+    name = event.organizer[:name]
+    cn = name ? %(;CN="#{name}") : ""
+    "ORGANIZER#{cn}:mailto:#{event.organizer[:email]}"
   end
 end
