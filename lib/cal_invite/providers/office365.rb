@@ -52,6 +52,7 @@ module CalInvite
         params = {
           subject: url_encode(event.title),
           path: '/calendar/action/compose',
+          rru: 'addevent',
           allday: 'true'
         }
 
@@ -73,7 +74,8 @@ module CalInvite
       def generate_single_event
         params = {
           subject: url_encode(event.title),
-          path: '/calendar/action/compose'
+          path: '/calendar/action/compose',
+          rru: 'addevent'
         }
 
         raise ArgumentError, "Start time is required" unless event.start_time
@@ -119,6 +121,8 @@ module CalInvite
           params[:to] = url_encode(attendee_emails.join(';'))
         end
 
+        params[:freebusy] = event.busy ? 'busy' : 'free' unless event.busy.nil?
+
         params
       end
 
@@ -128,7 +132,7 @@ module CalInvite
       # @return [String] The complete Office 365 calendar URL
       def build_url(params)
         query = params.map { |k, v| "#{k}=#{v}" }.join('&')
-        "https://outlook.office.com/owa/?#{query}"
+        "https://outlook.office.com/calendar/deeplink/compose?#{query}"
       end
     end
   end

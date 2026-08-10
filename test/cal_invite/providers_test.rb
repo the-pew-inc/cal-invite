@@ -43,7 +43,9 @@ module CalInvite
 
     def test_outlook_calendar_url
       url = @event.generate_calendar_url(:outlook)
-      assert_match %r{^https://outlook\.live\.com/calendar/0/action/compose}, url
+      assert_match %r{^https://outlook\.live\.com/calendar/deeplink/compose\?}, url
+      assert_match %r{path=/calendar/action/compose}, url
+      assert_match %r{rru=addevent}, url
       assert_match %r{&subject=Test\+Meeting}, url
       assert_match %r{&startdt=2024-01-01T09:00:00Z}, url
       assert_match %r{&enddt=2024-01-01T10:00:00Z}, url
@@ -51,7 +53,8 @@ module CalInvite
 
     def test_office365_calendar_url
       url = @event.generate_calendar_url(:office365)
-      assert_match %r{^https://outlook\.office\.com/owa/\?}, url
+      assert_match %r{^https://outlook\.office\.com/calendar/deeplink/compose\?}, url
+      assert_match %r{rru=addevent}, url
       assert_match %r{subject=Test\+Meeting}, url  # Removed the & prefix since it could be anywhere in the query string
       assert_match %r{startdt=2024-01-01T09%3A00%3A00Z}, url
       assert_match %r{enddt=2024-01-01T10%3A00%3A00Z}, url
@@ -59,6 +62,37 @@ module CalInvite
       assert_match %r{path=/calendar/action/compose}, url
       assert_match %r{body=}, url
       assert_match %r{location=}, url
+    end
+
+    def test_google_calendar_url_optional_params
+      event = Event.new(
+        title: "Test Meeting",
+        start_time: @start_time,
+        end_time: @end_time,
+        timezone: "America/New_York",
+        attendees: ["alice@example.com", "bob@example.com"],
+        show_attendees: true,
+        rrule: "FREQ=WEEKLY;COUNT=5",
+        busy: true
+      )
+
+      url = event.generate_calendar_url(:google)
+      assert_match %r{ctz=America%2FNew_York}, url
+      assert_match %r{add=alice%40example\.com%2Cbob%40example\.com}, url
+      assert_match %r{recur=RRULE%3AFREQ%3DWEEKLY%3BCOUNT%3D5}, url
+      assert_match %r{crm=BUSY}, url
+    end
+
+    def test_outlook_and_office365_freebusy_param
+      event = Event.new(
+        title: "Test Meeting",
+        start_time: @start_time,
+        end_time: @end_time,
+        busy: false
+      )
+
+      assert_match %r{freebusy=free}, event.generate_calendar_url(:outlook)
+      assert_match %r{freebusy=free}, event.generate_calendar_url(:office365)
     end
 
     def test_yahoo_calendar_url

@@ -79,9 +79,9 @@ Pass one of these symbols to `generate_calendar_url`:
 
 | Symbol      | Output                          | Notes |
 |-------------|----------------------------------|-------|
-| `:google`   | Google Calendar URL             | |
-| `:outlook`  | Outlook (outlook.live.com) URL   | |
-| `:office365`| Outlook 365 URL                 | |
+| `:google`   | Google Calendar URL             | Honors `attendees`/`show_attendees` (`add=`), `timezone` (`ctz=`), `rrule` (`recur=`), `busy` (`crm=BUSY`/`AVAILABLE`). |
+| `:outlook`  | Outlook (outlook.live.com) URL   | Honors `attendees`/`show_attendees` (`to=`), `busy` (`freebusy=`). |
+| `:office365`| Outlook 365 URL                 | Honors `attendees`/`show_attendees` (`to=`), `busy` (`freebusy=`). |
 | `:yahoo`    | Yahoo Calendar URL              | |
 | `:ical`     | `.ics` content (`METHOD:PUBLISH` or `:REQUEST`) | Apple iCal / any iCalendar-compatible app |
 | `:ics`      | `.ics` content (`METHOD:PUBLISH` or `:REQUEST`) | Generic RFC 5545 file |

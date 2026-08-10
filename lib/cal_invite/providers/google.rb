@@ -109,6 +109,10 @@ module CalInvite
         description_parts << "Virtual Meeting URL: #{format_url}" if format_url
         params[:details] = url_encode(description_parts.join("\n\n")) if description_parts.any?
         params[:location] = url_encode(format_location) if format_location
+        params[:ctz] = url_encode(event.timezone) if event.timezone
+        params[:add] = url_encode(attendee_emails.join(',')) if attendee_emails.any?
+        params[:recur] = url_encode("RRULE:#{event.rrule}") if event.rrule
+        params[:crm] = event.busy ? 'BUSY' : 'AVAILABLE' unless event.busy.nil?
         params
       end
 

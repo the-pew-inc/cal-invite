@@ -55,7 +55,8 @@ module CalInvite
       # @return [String] The Outlook.com calendar URL for an all-day event
       def generate_all_day_event
         params = {
-          path: '/calendar/0/action/compose',
+          path: '/calendar/action/compose',
+          rru: 'addevent',
           subject: url_encode(event.title),
           allday: 'true'
         }
@@ -77,7 +78,8 @@ module CalInvite
       # @raise [ArgumentError] If start_time or end_time is missing
       def generate_single_event
         params = {
-          path: '/calendar/0/action/compose',
+          path: '/calendar/action/compose',
+          rru: 'addevent',
           subject: url_encode(event.title)
         }
 
@@ -124,6 +126,8 @@ module CalInvite
           params[:to] = url_encode(attendee_emails.join(';'))
         end
 
+        params[:freebusy] = event.busy ? 'busy' : 'free' unless event.busy.nil?
+
         params
       end
 
@@ -133,7 +137,7 @@ module CalInvite
       # @return [String] The complete Outlook.com calendar URL
       def build_url(params)
         query = params.map { |k, v| "#{k}=#{v}" }.join('&')
-        "https://outlook.live.com/calendar/0/action/compose?#{query}"
+        "https://outlook.live.com/calendar/deeplink/compose?#{query}"
       end
     end
   end
