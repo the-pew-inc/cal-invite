@@ -1,6 +1,6 @@
 # Calendar App Example
 
-This example application demonstrates how to use the [cal-invite](https://github.com/the-pew-inc/cal-invite) gem to generate calendar invites across multiple platforms. The app shows different types of calendar events and how to integrate them with various calendar providers.
+This example application demonstrates how to use the [cal-invite](https://github.com/DashAPI-ai/cal-invite) gem to generate calendar invites across multiple platforms. The app shows different types of calendar events and how to integrate them with various calendar providers.
 
 ## Installation
 
@@ -120,7 +120,7 @@ The example application provides a simple web interface where you can:
 
 ## Contributing
 
-Feel free to submit issues and enhancement requests through the main [cal-invite repository](https://github.com/the-pew-inc/cal-invite).
+Feel free to submit issues and enhancement requests through the main [cal-invite repository](https://github.com/DashAPI-ai/cal-invite).
 
 ## License
 

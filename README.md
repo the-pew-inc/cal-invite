@@ -3,9 +3,9 @@
 A Ruby gem for generating calendar invitations across multiple calendar platforms with caching and webhook support.
 
 [![Gem Version](https://badge.fury.io/rb/cal-invite.svg)](https://badge.fury.io/rb/cal-invite)
-![Build Status](https://github.com/the-pew-inc/cal-invite/actions/workflows/main.yml/badge.svg)
+![Build Status](https://github.com/DashAPI-ai/cal-invite/actions/workflows/main.yml/badge.svg)
 
-![License](https://img.shields.io/github/license/the-pew-inc/cal-invite.svg)
+![License](https://img.shields.io/github/license/DashAPI-ai/cal-invite.svg)
 
 ## Compatibility
 
@@ -235,7 +235,7 @@ CalInvite.configure do |config|
 end
 ```
 
-For detailed information about configuring caching in Rails applications and available options, see our [Caching Guide](https://github.com/the-pew-inc/cal-invite/blob/master/CACHING.md). For every other configuration option (`Event` attributes, providers, email invites), see [CONFIGURATION.md](CONFIGURATION.md).
+For detailed information about configuring caching in Rails applications and available options, see our [Caching Guide](https://github.com/DashAPI-ai/cal-invite/blob/master/CACHING.md). For every other configuration option (`Event` attributes, providers, email invites), see [CONFIGURATION.md](CONFIGURATION.md).
 
 ## Development
 
@@ -251,7 +251,7 @@ Run all the tests before submitting: `bundle exec rake test`
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/the-pew-inc/cal-invite. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [code of conduct](https://github.com/the-pew-inc/cal-invite/blob/master/CODE_OF_CONDUCT.md).
+Bug reports and pull requests are welcome on GitHub at https://github.com/DashAPI-ai/cal-invite. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [code of conduct](https://github.com/DashAPI-ai/cal-invite/blob/master/CODE_OF_CONDUCT.md).
 
 ## Documentation
 
@@ -265,4 +265,4 @@ The gem is available as open source under the terms of the [MIT License](https:/
 
 ## Code of Conduct
 
-Everyone interacting in the Cal::Invite project's codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/the-pew-inc/cal-invite/blob/master/CODE_OF_CONDUCT.md).
+Everyone interacting in the Cal::Invite project's codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/DashAPI-ai/cal-invite/blob/master/CODE_OF_CONDUCT.md).
