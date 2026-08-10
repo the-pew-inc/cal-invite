@@ -1,5 +1,12 @@
 # Cal Invite
 
+## [v0.2.1] - 2026-08-10
+
+- `:google` provider: honor `Event#attendees`/`show_attendees` (`add=`), `Event#timezone` (`ctz=`), `Event#rrule` (`recur=`), and `Event#busy` (`crm=BUSY`/`AVAILABLE`) in the generated Google Calendar URL — these were already modeled on `Event` for the ics providers but never wired into `:google`.
+- `:outlook`/`:office365` providers: honor `Event#busy` via `freebusy=`.
+- `:outlook`/`:office365` providers: fix stale deep-link URLs. Switched from the legacy `outlook.live.com/calendar/0/action/compose` and `outlook.office.com/owa/` hosts to the currently documented `outlook.live.com/calendar/deeplink/compose` and `outlook.office.com/calendar/deeplink/compose`, and added the required `rru=addevent` param.
+- CI: fix Rails 6 + Ruby 3.3/3.4 test failures (missing `logger`/`mutex_m`/`bigdecimal` requires), fix RDoc doc generation (stale `.rdoc_options` crashing the darkfish generator and silently excluding all of `lib/`), and fix a GitHub Pages deploy deadlock (duplicate `concurrency: group: "pages"` between `main.yml` and the reusable `documentation.yml`).
+
 ## [v0.2.0] - 2026-08-09
 
 - Add `Event#organizer` and a `method:` option (`:publish`/`:request`/`:cancel`) to `generate_calendar_url`, so ics/ical output can carry `METHOD:REQUEST`/`METHOD:CANCEL` + `ORGANIZER`/`SEQUENCE`/`STATUS`, matching what mail clients (Gmail, Outlook, Apple Mail) need to render an attached `.ics` as an RSVP-capable meeting invite (or a real cancellation) rather than a plain file
