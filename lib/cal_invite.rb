@@ -1,4 +1,7 @@
 # lib/cal_invite.rb
+require 'logger'
+require 'mutex_m'
+require 'bigdecimal'
 require 'active_support'
 require 'active_support/core_ext'
 require 'securerandom'
