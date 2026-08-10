@@ -3,6 +3,9 @@ source "https://rubygems.org"
 
 group :development, :test do
   gem "bundler"
+  gem "logger"
+  gem "mutex_m"
+  gem "bigdecimal"
   gem "rails", "~> 8.0.0"
   gem "actionview", "~> 8.0.0"
   gem "activesupport", "~> 8.0.0"

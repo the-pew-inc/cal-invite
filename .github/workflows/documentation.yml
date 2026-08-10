@@ -30,7 +30,7 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v7
 
     - name: Remove .gitmodules if exists
       run: |
@@ -59,7 +59,7 @@ jobs:
 
     - name: Generate RDoc
       run: |
-        bundle exec rdoc lib/**/*.rb --exclude Example/calendar_app --op doc --force-update --verbose
+        bundle exec rdoc lib/**/*.rb --exclude Example/calendar_app --op doc --format=darkfish --force-update --verbose
 
     - name: Debug Deployment
       run: |

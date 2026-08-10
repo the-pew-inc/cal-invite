@@ -39,6 +39,9 @@ Gem::Specification.new do |spec|
   # spec.add_dependency "example-gem", "~> 1.0"
   spec.add_dependency "activesupport", ">= 6.0"
   spec.add_dependency "tzinfo", ">= 1.2"
+  spec.add_dependency "logger"
+  spec.add_dependency "mutex_m"
+  spec.add_dependency "bigdecimal"
   spec.add_development_dependency 'rdoc', '~> 8.0'
 
   # Configure RDoc options
